@@ -1,12 +1,36 @@
 import * as React from "react";
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {
   BarChart,
   ProgressChart
 } from "react-native-chart-kit";
+import { Pedometer } from 'expo-sensors';
 const Steps = () => {
+  const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
+  const [pastStepCount, setPastStepCount] = useState(0);
   const navigation = useNavigation();
+
+    const isAvailable = Pedometer.isAvailableAsync();
+    setIsPedometerAvailable(String(isAvailable));
+    const dataTest = [];
+    if (isAvailable) {
+      const date = new Date();
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 1);
+
+      for(let i = 0; i < 7 ; i++){
+        if(Pedometer.getStepCountAsync(date.getDate-(i+1), date.getDate-i))
+          dataTest.push(Pedometer.getStepCountAsync(date.getDate-(i+1), date.getDate-i));
+      }
+
+      for(let test of dataTest){
+        console.log(test);
+      }
+    }
+
   const data = {
     labels: ["08.12", "09.12", "10.12", "11.12", "12.12","13.12","14.12"],
     datasets: [
@@ -30,7 +54,7 @@ const Steps = () => {
       <View>
       <ProgressChart
         style={styles.ringChart}
-        data={[5135/8000]}
+        data={[dataTest.indexOf(0)/8000]}
         width={300}
         height={220}
         chartConfig={chartConfig}

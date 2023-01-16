@@ -1,17 +1,42 @@
 import * as React from "react";
-import { Image, StyleSheet, View, Pressable } from "react-native";
+import { Text, Image, StyleSheet, View, Pressable, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import { useState, useEffect } from 'react';
 
 const Scan = () => {
   const navigation = useNavigation();
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+
+  useEffect(() => {
+    const getBarCodeScannerPermissions = async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    };
+
+    getBarCodeScannerPermissions();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
   return (
     <View style={styles.scan}>
-      <Image
-        style={styles.image1Icon}
-        resizeMode="cover"
-        source={require("../assets/image-1.png")}
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
       />
+      
       <Image
         style={styles.vectorIcon}
         resizeMode="cover"
