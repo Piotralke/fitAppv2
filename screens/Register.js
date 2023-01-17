@@ -7,12 +7,7 @@ const Register = () => {
 
   return (
     <View style={styles.register1}>
-      <Pressable
-        style={styles.rectanglePressable}
-        onPress={() => navigation.navigate("DrawerRoot", { screen: "Login" })}
-      >
-      <Text style={styles.register}>Register</Text>
-      </Pressable>
+      
       <View style={styles.groupView}>
         <TextInput
           style={styles.rectangleTextInput}
@@ -20,20 +15,26 @@ const Register = () => {
           keyboardType="default"
         />
         <TextInput
-          style={styles.rectangleTextInput4}
+          style={styles.rectangleTextInput}
           placeholder="Login"
           keyboardType="default"
         />
         <TextInput
-          style={styles.rectangleTextInput3}
+          style={styles.rectangleTextInput}
           placeholder="Password"
           keyboardType="default"
         />
         <TextInput
-          style={styles.rectangleTextInput2}
+          style={styles.rectangleTextInput}
           placeholder="Confirm password"
           keyboardType="default"
         />
+        <Pressable
+        style={styles.rectanglePressable}
+        onPress={() => navigation.navigate("DrawerRoot", { screen: "Login" })}
+      >
+      <Text style={styles.register}>Register</Text>
+      </Pressable>
       </View>
     </View>
   );
@@ -42,7 +43,6 @@ const Register = () => {
 const styles = StyleSheet.create({
   rectanglePressable: {
     position: "relative",
-    top: 624,
     alignSelf:"center",
     borderRadius: 54,
     backgroundColor: "#91c789",
@@ -67,8 +67,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   rectangleTextInput: {
-    position: "absolute",
-    top: 0,
+    position: "relative",
     borderRadius: 10,
     backgroundColor: "#967474",
     shadowColor: "rgba(0, 0, 0, 0.25)",
@@ -85,86 +84,7 @@ const styles = StyleSheet.create({
     width: 318,
     height: 40,
     textAlign: "center",
-  },
-  rectangleTextInput1: {
-    position: "absolute",
-    top: 372,
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-    textAlign: "center",
-  },
-  rectangleTextInput2: {
-    position: "absolute",
-    top: 279,
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-    textAlign: "center",
-  },
-  rectangleTextInput3: {
-    position: "absolute",
-    top: 186,
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-    textAlign: "center",
-  },
-  rectangleTextInput4: {
-    position: "absolute",
-    top: 93,
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-    textAlign: "center",
+    marginVertical: 30,
   },
   groupView: {
     position: "relative",
@@ -174,6 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     top: "10%",
     width: "100%",
+    
   },
   register1: {
     position: "relative",

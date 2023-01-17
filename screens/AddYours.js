@@ -56,26 +56,35 @@ const styles = StyleSheet.create({
     width: 248,
     height: 56,
     marginTop: 10,
+    paddingTop: 5,
   },
   list: {
     flex: 1,
     marginHorizontal:"auto", 
     alignItems:"center",
     paddingTop: "10%",
-    
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   meal: {
     position: "relative",
     width: 300,
-    padding: 10,
-
-    
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding:5,
   },
   addHistory: {
-    position: "relative",
     backgroundColor: "#967474",
+    position: "relative",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginHorizontal: "auto",
+    alignItems: 'center',
     width: "100%",
     flex: 1,
+    overflow: "hidden",
   },
 });
 const CONTENT = [

@@ -42,7 +42,6 @@ const Scan = () => {
         resizeMode="cover"
         source={require("../assets/vector.png")}
       />
-      <View style={styles.rectangleView} />
       <Pressable
         style={styles.iconChevronDown}
         onPress={() =>
@@ -60,13 +59,6 @@ const Scan = () => {
 };
 
 const styles = StyleSheet.create({
-  image1Icon: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: 414,
-    height: 896,
-  },
   vectorIcon: {
     position: "absolute",
     height: "20.14%",
@@ -78,23 +70,6 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     overflow: "hidden",
     maxHeight: "100%",
-  },
-  rectangleView: {
-    position: "absolute",
-    top: 16,
-    left: 20,
-    borderRadius: 54,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    width: 40,
-    height: 41,
   },
   icon: {
     height: "100%",

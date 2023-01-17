@@ -22,36 +22,36 @@ const AddAdd = () => {
           placeholder="Placeholder text"
           keyboardType="default"
         />
-        <Text style={styles.nutritionFactsPer100g}>
+        <Text style={styles.name}>
           Nutrition facts per 100g
         </Text>
-        <Text style={styles.calories}>Calories</Text>
-        <TextInput style={styles.rectangleTextInput1} 
+        <Text style={styles.name}>Calories</Text>
+        <TextInput style={styles.rectangleTextInput} 
         placeholder="Placeholder text"
         keyboardType="default"
         />
-        <Text style={styles.protein}>Protein</Text>
+        <Text style={styles.name}>Protein</Text>
         <TextInput
-          style={styles.rectangleTextInput2}
+          style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
         />
-        <Text style={styles.fat}>Fat</Text>
+        <Text style={styles.name}>Fat</Text>
         <TextInput
-          style={styles.rectangleTextInput3}
+          style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
         />
-        <Text style={styles.carbo}>Carbo</Text>
+        <Text style={styles.name}>Carbo</Text>
         <TextInput
-          style={styles.rectangleTextInput4}
+          style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
         />
-        <Text style={styles.barcode}>Barcode*</Text>
+        <Text style={styles.name}>Barcode*</Text>
         <View style={{flexDirection: 'row'}}>
           <TextInput
-          style={styles.rectangleTextInput5}
+          style={styles.rectangleTextInput2}
           placeholder="Placeholder text"
           keyboardType="default"
          />
@@ -71,90 +71,13 @@ const AddAdd = () => {
             </Pressable>
         
         
-        <Text style={styles.notRequired}>*Not required</Text>
+        <Text style={styles.name}>*Not required</Text>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  rectangleView: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    backgroundColor: "#91c789",
-    width: 414,
-    height: 55,
-  },
-  icon: {
-    height: "100%",
-    width: "100%",
-    maxWidth: "100%",
-    overflow: "hidden",
-    maxHeight: "100%",
-  },
-  iconChevronDown: {
-    position: "absolute",
-    left: "4.01%",
-    top: "1.85%",
-    right: "90.95%",
-    bottom: "94.78%",
-    width: "5.03%",
-    height: "3.37%",
-  },
-  rectanglePressable: {
-    position: "absolute",
-    top: 7,
-    left: 354,
-    borderRadius: 54,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    width: 40,
-    height: 41,
-  },
-  search: {
-    position: "absolute",
-    top: 21,
-    left: 49,
-  },
-  vectorIcon: {
-    position: "absolute",
-    height: "2.37%",
-    width: "5.13%",
-    top: "1.9%",
-    right: "7.19%",
-    bottom: "95.73%",
-    left: "87.68%",
-    maxWidth: "100%",
-    overflow: "hidden",
-    maxHeight: "100%",
-  },
-  rectangleView1: {
-    position: "absolute",
-    right: 0,
-    bottom: 786,
-    left: 0,
-    backgroundColor: "#91c789",
-    height: 55,
-  },
-  youreAddingMealTo2ndBre: {
-    position: "absolute",
-    top: 66,
-    left: 26,
-    fontSize: 20,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#000",
-    textAlign: "left",
-    undefined: "",
-  },
   rectangleTextInput: {
     position: "relative",
     borderRadius: 10,
@@ -172,6 +95,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     width: 318,
     height: 40,
+    textAlign: "center",
   },
   name: {
     position: "relative",
@@ -179,33 +103,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     fontFamily: "Epilogue",
     color: "#fff",
-    textAlign: "left",
-  },
-  rectangleTextInput1: {
-    position: "relative",
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-  },
-  calories: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
+    textAlign: "center",
   },
   rectangleTextInput2: {
     position: "relative",
@@ -222,116 +120,9 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderColor: "#91c789",
     borderWidth: 4,
-    width: 318,
-    height: 40,
-  },
-  protein: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
-  },
-  rectangleTextInput3: {
-    position: "relative",
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-  },
-  fat: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
-  },
-  rectangleTextInput4: {
-    position: "relative",
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
-    width: 318,
-    height: 40,
-  },
-  carbo: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
-  },
-  rectangleTextInput5: {
-    position: "relative",
-    borderRadius: 10,
-    backgroundColor: "#967474",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    borderStyle: "solid",
-    borderColor: "#91c789",
-    borderWidth: 4,
     width: 285,
     height: 40,
-  },
-  barcode: {
-    marginBlockStart: 0,
-    marginBlockEnd: 0,
-  },
-  barcode1: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
-  },
-  notRequired: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
-    right: 0,
-    bottom: 0,
-  },
-  nutritionFactsPer100g: {
-    position: "relative",
-    fontSize: 16,
-    fontStyle: "italic",
-    fontFamily: "Epilogue",
-    color: "#fff",
-    textAlign: "left",
+    textAlign:"center",
   },
   rectanglePressable1: {
     position: "relative",
@@ -357,29 +148,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginHorizontal: "auto",
     top:15,
-  },
-  rectanglePressable2: {
-    position: "relative",
-    borderRadius: 54,
-    backgroundColor: "#91c789",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 4,
-    elevation: 4,
-    shadowOpacity: 1,
-    width: 30,
-    height: 31,
-  },
-  vectorIcon1: {
-    position: "relative",
-    height: "2.17%",
-    width: "4.23%",
-    maxWidth: "100%",
-    overflow: "hidden",
-    maxHeight: "100%",
   },
   groupView: {
     flexDirection: 'column',

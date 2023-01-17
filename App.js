@@ -138,7 +138,8 @@ function BottomTabsRoot({ navigation }) {
           </Pressable>
           ),
           headerTitle: () => (
-          <TextInput  
+          <TextInput 
+          style={styles.search} 
             placeholder="Search"
             keyboardType="default"
             placeholderTextColor="#fff"
@@ -190,6 +191,7 @@ function BottomTabsRoot({ navigation }) {
           ),
           headerTitle: () => (
           <TextInput  
+            style={styles.search}
             placeholder="Search"
             keyboardType="default"
             placeholderTextColor="#fff"
@@ -315,10 +317,14 @@ const styles = StyleSheet.create({
     height: 55,
   },
   scan: {
-    marginRight:8,
+    marginRight:12,
   },
   back: {
-    marginLeft:3,
+    marginLeft:12,
+    marginTop:4,
+  },
+  search:{
+    height: 30,
   },
   rectanglePressable: {
     position: "absolute",
