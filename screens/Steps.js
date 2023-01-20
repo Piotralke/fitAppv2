@@ -7,27 +7,22 @@ import {
   ProgressChart
 } from "react-native-chart-kit";
 import { Pedometer } from 'expo-sensors';
-const Steps = () => {
+const Steps = async() => {
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
   const [pastStepCount, setPastStepCount] = useState(0);
   const navigation = useNavigation();
-
-    const isAvailable = Pedometer.isAvailableAsync();
+  const [dataTest,setDataTest] =useState([]);
+    const isAvailable = await Pedometer.isAvailableAsync();
     setIsPedometerAvailable(String(isAvailable));
-    const dataTest = [];
     if (isAvailable) {
       const date = new Date();
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - 1);
 
       for(let i = 0; i < 7 ; i++){
-        if(Pedometer.getStepCountAsync(date.getDate-(i+1), date.getDate-i))
-          dataTest.push(Pedometer.getStepCountAsync(date.getDate-(i+1), date.getDate-i));
-      }
-
-      for(let test of dataTest){
-        console.log(test);
+        const test = await Pedometer.getStepCountAsync(new Date(date.getFullYear(), date.getMonth(), date.getDate()-(i+1)), new Date(date.getFullYear(), date.getMonth(), date.getDate()-i));
+        if(test)
+        {
+          setDataTest(dataTest=>[...dataTest, test.steps])
+        }
       }
     }
 
@@ -54,7 +49,7 @@ const Steps = () => {
       <View>
       <ProgressChart
         style={styles.ringChart}
-        data={[dataTest.indexOf(0)/8000]}
+        data={[5123/8000]}
         width={300}
         height={220}
         chartConfig={chartConfig}

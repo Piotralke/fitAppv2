@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   TouchableOpacity
 } from "react-native";
-
+import {auth, db} from "../firebase.js";
 const Menu = ({ state, navigation }) => {
   return (
     <SafeAreaView style={styles.menu}>      
@@ -36,7 +36,10 @@ const Menu = ({ state, navigation }) => {
         </TouchableOpacity> 
         <TouchableOpacity
         style={[styles.rectanglePressable]}
-        onPress={() => navigation.navigate("Login")}> 
+        onPress={() => {auth.signOut();
+          navigation.navigate("Login")}
+        
+        }> 
           
         <Text style={styles.logout}>Logout</Text>
         </TouchableOpacity> 

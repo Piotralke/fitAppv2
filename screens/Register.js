@@ -1,37 +1,56 @@
 import * as React from "react";
+import { useState, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import {auth, db} from "../firebase.js";
 const Register = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+
+  const handleSignUP = () => {
+    if(password===confirmPassword)
+    {
+      auth
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+        const user = userCredentials.user;
+        console.log(user.email);
+        db.collection('users').doc(user.uid).set({'email': user.email})
+      })
+      .catch(error => alert(error.message))
+      
+    }
+    else{}
+  }
 
   return (
     <View style={styles.register1}>
       
       <View style={styles.groupView}>
         <TextInput
+        onChangeText={text => setEmail(text)}
           style={styles.rectangleTextInput}
           placeholder="E-mail"
           keyboardType="default"
         />
         <TextInput
           style={styles.rectangleTextInput}
-          placeholder="Login"
-          keyboardType="default"
-        />
-        <TextInput
-          style={styles.rectangleTextInput}
+          onChangeText={text => setPassword(text)}
           placeholder="Password"
           keyboardType="default"
         />
         <TextInput
           style={styles.rectangleTextInput}
+          onChangeText={text => setConfirmPassword(text)}
           placeholder="Confirm password"
           keyboardType="default"
         />
         <Pressable
         style={styles.rectanglePressable}
-        onPress={() => navigation.navigate("DrawerRoot", { screen: "Login" })}
+        onPress={handleSignUP}
       >
       <Text style={styles.register}>Register</Text>
       </Pressable>

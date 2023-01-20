@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -8,9 +9,34 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import {auth, db} from "../firebase.js";
 const Login = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if(user){
+        setPassword("");
+        setEmail("");
+        navigation.navigate("DrawerRoot", { screen: "MainView" })
+      }
+    })
+    return unsubscribe
+  },[])
+
+  const handleLogin = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then(userCredentials => {
+        const user = userCredentials.user;
+        console.log(user.email);
+      })
+      .catch(error => alert(error.message))
+    }
+
+  
+
 
   return (
     <View style={styles.login}>
@@ -23,18 +49,23 @@ const Login = () => {
       />
       <View style={styles.groupView}>
         <TextInput
+          value={email}
           style={styles.rectangleTextInput}
-          placeholder="login"
+          onChangeText={text => setEmail(text)}
+          placeholder="email"
           keyboardType="default"
         />
         <TextInput
+        value={password}
           style={styles.rectangleTextInput1}
+          onChangeText={text => setPassword(text)}
           placeholder="password"
           keyboardType="default"
+          secureTextEntry={true}
         />
         <Pressable
         style={styles.rectanglePressable}
-        onPress={() => navigation.navigate("DrawerRoot", { screen: "MainView" })}>
+        onPress={handleLogin}>
       <Text style={styles.logIn}>Log in</Text>
       </Pressable>
       <Pressable

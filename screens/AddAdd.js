@@ -9,10 +9,17 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import {auth, db} from "../firebase.js";
+import { useState, useEffect } from "react";
 const AddAdd = () => {
+  const [name,setName] =useState("");
+  const [calories,setCalories] =useState("");
+  const [protein,setProtein] =useState("");
+  const [fat,setFat] =useState("");
+  const [carbo,setCarbo] =useState("");
+  const [barcode,setBarcode] =useState("");
   const navigation = useNavigation();
-
+  const uid = auth.currentUser?.uid;
   return (
     <View style={styles.addAdd}>
       <View style={styles.groupView}>
@@ -21,6 +28,7 @@ const AddAdd = () => {
           style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
+          onChangeText={text => setName(text)}
         />
         <Text style={styles.name}>
           Nutrition facts per 100g
@@ -29,24 +37,28 @@ const AddAdd = () => {
         <TextInput style={styles.rectangleTextInput} 
         placeholder="Placeholder text"
         keyboardType="default"
+        onChangeText={text => setCalories(text)}
         />
         <Text style={styles.name}>Protein</Text>
         <TextInput
           style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
+          onChangeText={text => setProtein(text)}
         />
         <Text style={styles.name}>Fat</Text>
         <TextInput
           style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
+          onChangeText={text => setFat(text)}
         />
         <Text style={styles.name}>Carbo</Text>
         <TextInput
           style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="default"
+          onChangeText={text => setCarbo(text)}
         />
         <Text style={styles.name}>Barcode*</Text>
         <View style={{flexDirection: 'row'}}>
@@ -54,6 +66,7 @@ const AddAdd = () => {
           style={styles.rectangleTextInput2}
           placeholder="Placeholder text"
           keyboardType="default"
+          onChangeText={text => setBarcode(text)}
          />
 
             <Pressable onPress={() => navigation.navigate("Scan")}>
@@ -65,8 +78,19 @@ const AddAdd = () => {
             </Pressable>
 
         </View>
-        
-        <Pressable style={styles.rectanglePressable1} onPress={() => navigation.navigate("DrawerRoot", { screen: "MainView" })}>
+        <Pressable style={styles.rectanglePressable1} onPress={async () => {
+              const meal = await db.collection('meals').add({
+              name: name,
+              calories: calories,
+              protein: protein,
+              fat: fat,
+              carbo: carbo,
+              barcode: barcode,
+              creator: uid.trim(),
+            });
+            console.log("utworzono danie o ID: ", meal.id);
+            navigation.replace("DrawerRoot", { screen: "MainView" })
+        }}>
         <Text style={styles.save}>Save</Text>
             </Pressable>
         

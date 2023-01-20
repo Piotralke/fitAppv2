@@ -1,4 +1,4 @@
-import React , {useState} from "react";
+import React , {useState, useEffect} from "react";
 import {
   StyleSheet,
   View,
@@ -9,22 +9,36 @@ import {
   Text,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
+import {auth, db} from "../firebase.js";
 const AddYours = () => {
+  const [dataTest,setDataTest] =useState([]);
   const navigation = useNavigation();
-
-  
+  const uid = auth.currentUser?.uid;
+  useEffect(() => {
+    setDataTest([]);
+    db.collection('meals').get()
+      .then((querySnapshot)=>{
+        querySnapshot.forEach((doc)=>{
+          if(doc.data().creator.trim()===uid)
+          {
+            setDataTest(dataTest=>[...dataTest, doc])
+          }
+        })
+      }).catch(error => {
+        console.log(error);
+      });
+  }, []);
   return (
     <View style={styles.addHistory}>
       <View style={styles.list}>
         <ScrollView>
-          {CONTENT.map((item,index)=>{
+          {dataTest.map((item,index)=>{
             return (
               <View style={styles.meal} key={index}>
                   <TouchableOpacity onPress={()=>{
-                    navigation.navigate("MealProperties")
+                    navigation.navigate("MealProperties",{id: item.id})
                   }}>
-                    <Text style={styles.one}>{item.name}</Text>
+                    <Text style={styles.one}>{item.data().name}</Text>
                   </TouchableOpacity>
               </View>
               

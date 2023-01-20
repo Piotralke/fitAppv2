@@ -1,35 +1,59 @@
 import * as React from "react";
-import { StyleSheet, View, Text, Image, Pressable, TextInput } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
+import { StyleSheet, View, Text, Image, Pressable, TextInput, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useState, useEffect } from "react";
+import { auth, db } from "../firebase.js";
 const MealProperties = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const mid = route.params.id;
+  const [meal, setMeal] = useState({});
+  useEffect(() => {
+    setMeal({});
+    console.log(mid)
+    db.collection('meals').doc(mid).get()
+      .then(
+        doc => {
+          if (doc.exists) {
+            console.log(doc.data().name)
+            setMeal(doc.data())
+          } else {
+            console.log("No such document!")
+          }
+        }
+      ).catch(error => {
+        console.log(error);
+      });
+  }, []);
 
   return (
-    <View style={styles.mealProperties}>
-      <View style={styles.rectangleView}>
-      <Text style={styles.facts}>
-        <Text style={styles.title}>Eggs{'\n'}</Text>
-        <Text >Nutrition facts per 100g:{'\n'}</Text>
-        <Text >Calories: 100kcal{'\n'}</Text>
-        <Text >Protein: 6g{'\n'}</Text>
-        <Text >Fat: 13.2g{'\n'}</Text>
-        <Text >Carbo: 60.4g{'\n'}</Text>
-      </Text>
-      </View>
-      <Text style={styles.eatenGrams}>Eaten grams</Text>
-      <TextInput
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
+      <View style={styles.mealProperties} >
+        <View style={styles.rectangleView}>
+          <Text style={styles.facts}>
+            <Text style={styles.title}>{meal.name}{'\n'}</Text>
+            <Text >Nutrition facts per 100g:{'\n'}</Text>
+            <Text >Calories: {meal.calories}{'kcal\n'}</Text>
+            <Text >Protein: {meal.protein}{'g\n'}</Text>
+            <Text >Fat: {meal.fat}{'g\n'}</Text>
+            <Text >Carbo: {meal.carbo}{'g\n'}</Text>
+          </Text>
+        </View>
+        <Text style={styles.eatenGrams}>Eaten grams</Text>
+        <TextInput
           style={styles.rectangleTextInput}
           placeholder="Placeholder text"
           keyboardType="number-pad"
+          keyboardShouldPersistTaps='handled'
         />
-      <Pressable
-        style={styles.rectanglePressable}
-        onPress={() => navigation.navigate("MainView")}
-      >
-      <Text style={styles.add}>Add</Text>
-      </Pressable>
-    </View>
+        <Pressable
+          style={styles.rectanglePressable}
+          onPress={() => navigation.navigate("MainView")}
+        >
+          <Text style={styles.add}>Add</Text>
+        </Pressable>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -48,8 +72,9 @@ const styles = StyleSheet.create({
     elevation: 4,
     shadowOpacity: 1,
     width: 354,
-    height: 241,
-    
+    height: 180,
+
+
   },
   title: {
     fontWeight: 'bold',
@@ -61,6 +86,7 @@ const styles = StyleSheet.create({
     fontFamily: "Epilogue",
     color: "#000",
     textAlign: "center",
+
   },
   rectangleTextInput: {
     position: "relative",
@@ -108,7 +134,7 @@ const styles = StyleSheet.create({
   },
   add: {
     position: "relative",
-    top :12,
+    top: 12,
     textAlign: "center",
     fontSize: 20,
     fontFamily: "Epilogue",
