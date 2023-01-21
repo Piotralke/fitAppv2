@@ -1,36 +1,42 @@
 import * as React from "react";
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text, Pressable } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   BarChart,
   ProgressChart
 } from "react-native-chart-kit";
 import { Pedometer } from 'expo-sensors';
-const Steps = async() => {
+const Steps = () => {
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
   const [pastStepCount, setPastStepCount] = useState(0);
   const navigation = useNavigation();
-  const [dataTest,setDataTest] =useState([]);
+  const [dataTest, setDataTest] = useState([]);
+
+  const subscribe = async () => {
     const isAvailable = await Pedometer.isAvailableAsync();
     setIsPedometerAvailable(String(isAvailable));
     if (isAvailable) {
       const date = new Date();
 
-      for(let i = 0; i < 7 ; i++){
-        const test = await Pedometer.getStepCountAsync(new Date(date.getFullYear(), date.getMonth(), date.getDate()-(i+1)), new Date(date.getFullYear(), date.getMonth(), date.getDate()-i));
-        if(test)
-        {
-          setDataTest(dataTest=>[...dataTest, test.steps])
+      for (let i = 0; i < 7; i++) {
+        const test = await Pedometer.getStepCountAsync(new Date(date.getFullYear(), date.getMonth(), date.getDate() - (i + 1)), new Date(date.getFullYear(), date.getMonth(), date.getDate() - i));
+        if (test) {
+          setDataTest(dataTest => [...dataTest, test.steps])
         }
       }
+      console.log(dataTest)
     }
-
+  }
+  useEffect(()=>{
+    const subscription=subscribe();
+    return () => subscription && subscription.remove();
+  }, []);
   const data = {
-    labels: ["08.12", "09.12", "10.12", "11.12", "12.12","13.12","14.12"],
+    labels: ["08.12", "09.12", "10.12", "11.12", "12.12", "13.12", "14.12"],
     datasets: [
       {
-        data: [4507, 7950, 5522, 7835, 6432, 7925,5135]
+        data: [4507, 7950, 5522, 7835, 6432, 7925, 5135]
       }
     ]
   };
@@ -47,37 +53,37 @@ const Steps = async() => {
   return (
     <View style={styles.steps1}>
       <View>
-      <ProgressChart
-        style={styles.ringChart}
-        data={[5123/8000]}
-        width={300}
-        height={220}
-        chartConfig={chartConfig}
-        verticalLabelRotation={0}
-        showValuesOnTopOfBars={true}
-      />
+        <ProgressChart
+          style={styles.ringChart}
+          data={[5123 / 8000]}
+          width={300}
+          height={220}
+          chartConfig={chartConfig}
+          verticalLabelRotation={0}
+          showValuesOnTopOfBars={true}
+        />
       </View>
       <View>
-      <BarChart
-        style={styles.barChart}
-        data={data}
-        width={300}
-        height={220}
-        chartConfig={chartConfig}
-        verticalLabelRotation={0}
-        showValuesOnTopOfBars={true}
-      />
+        <BarChart
+          style={styles.barChart}
+          data={data}
+          width={300}
+          height={220}
+          chartConfig={chartConfig}
+          verticalLabelRotation={0}
+          showValuesOnTopOfBars={true}
+        />
       </View>
       <Text style={styles.steps}>Steps today: 5135/8000</Text>
       <View style={styles.average}>
         <View style={styles.rectangleView2}>
-            <Text style={styles.yourAverageStepsForWeek}>
-              Your average steps for week:
-            </Text>
-            <Text style={styles.text20}>6427</Text>
-        </View>        
+          <Text style={styles.yourAverageStepsForWeek}>
+            Your average steps for week:
+          </Text>
+          <Text style={styles.text20}>6427</Text>
+        </View>
       </View>
-      
+
     </View>
   );
 };
@@ -112,7 +118,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 149,
   },
-  
+
   steps: {
     position: "relative",
     fontSize: 20,

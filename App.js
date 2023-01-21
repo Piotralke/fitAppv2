@@ -24,7 +24,7 @@ import History1 from "./components/History1";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { IconRegistry, ApplicationProvider } from "@ui-kitten/components";
 import * as eva from "@eva-design/eva";
-
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   View,
@@ -76,19 +76,25 @@ function DrawerRoot({ navigation }) {
   );
 }
 function BottomTabsRoot({ navigation }) {
+  const route = useRoute();
+  const cat_name = route.params.name;
+  console.log(cat_name);
+  console.log(route.params.date);
+  
   const [bottomTabItemsNormal] = React.useState([
-    <Yours />,
+    <Yours catName={cat_name}/>,
     <Add />,
     <History />,
   ]);
   const [bottomTabItemsActive] = React.useState([
-    <Yours1 />,
+    <Yours1 catName={cat_name}/>,
     <Add1 />,
     <History1 />,
   ]);
   return (
     <Tab.Navigator
-      screenOptions={{ headerShown: false }}
+    catName={cat_name}
+      screenOptions={{ headerShown: false, unmountOnBlur: true }}
       tabBar={({ state, descriptors, navigation }) => {
         const activeIndex = state.index;
         return (
@@ -108,6 +114,7 @@ function BottomTabsRoot({ navigation }) {
                   onPress={() => {
                     navigation.navigate({
                       name: state.routes[index].name,
+                      catName: {cat_name},
                       merge: true,
                     });
                   }}

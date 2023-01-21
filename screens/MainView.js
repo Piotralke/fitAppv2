@@ -1,5 +1,6 @@
 import React , {useState, useEffect} from "react";
 import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView, TouchableOpacity, LayoutAnimation, Alert, Button} from "react-native";
+
 import {
   Datepicker as RNKDatepicker,
   Icon as RNKIcon,
@@ -9,7 +10,7 @@ import {
   ProgressChart,
 } from "react-native-chart-kit";
 
-const ExpandableComponent = ({ item, onClickFunction }) => {
+const ExpandableComponent = ({ item, onClickFunction,date }) => {
   //Custom Component for the Expandable List
   const [layoutHeight, setLayoutHeight] = useState(0);
   const navigation = useNavigation();
@@ -32,7 +33,7 @@ const ExpandableComponent = ({ item, onClickFunction }) => {
         style={styles.header}>
           <View style={styles.mainbuttons}>
             <Text style={styles.headerText}>{item.category_name}</Text>
-            <TouchableOpacity style={[styles.settings1]} onPress={()=>navigation.navigate("BottomTabsRoot")}>
+            <TouchableOpacity style={[styles.settings1]} onPress={()=>navigation.navigate("BottomTabsRoot", {name: item.category_name, date:date })}>
                 <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-add-circle.png')} />
             </TouchableOpacity>
         </View>
@@ -95,6 +96,7 @@ const MainView = () => {
                 updateLayout(key);
               }}
               item={item}
+              date={datePicker}
             />
           ))}
         </ScrollView>

@@ -1,4 +1,4 @@
-import React , {useState, useEffect} from "react";
+import React , {useState, useEffect, useCallback} from "react";
 import {
   StyleSheet,
   View,
@@ -8,13 +8,19 @@ import {
   TextInput,
   Text,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, useFocusEffect} from "@react-navigation/native";
 import {auth, db} from "../firebase.js";
 const AddYours = () => {
   const [dataTest,setDataTest] =useState([]);
   const navigation = useNavigation();
+  const c = navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params
   const uid = auth.currentUser?.uid;
+  const route = useRoute();
+  //const [cat, setCat] = useState(route.params.name);
   useEffect(() => {
+    console.log(c);
+    console.log("chuj");
+   // console.log(this.props.catName);
     setDataTest([]);
     db.collection('meals').get()
       .then((querySnapshot)=>{
@@ -26,11 +32,12 @@ const AddYours = () => {
         })
       }).catch(error => {
         console.log(error);
-      });
-  }, []);
+      }); 
+  }, [c.date.toLocaleDateString()]);
   return (
     <View style={styles.addHistory}>
       <View style={styles.list}>
+        <Text>{c.date.toString()}</Text>
         <ScrollView>
           {dataTest.map((item,index)=>{
             return (
