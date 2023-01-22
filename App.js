@@ -54,6 +54,7 @@ function DrawerRoot({ navigation }) {
 
       <Drawer.Screen name="BottomTabsRoot" 
       component={BottomTabsRoot} 
+      screenOptions={{ unmountOnBlur: true }}
       />
       
       <Stack.Screen
@@ -82,18 +83,17 @@ function BottomTabsRoot({ navigation }) {
   console.log(route.params.date);
   
   const [bottomTabItemsNormal] = React.useState([
-    <Yours catName={cat_name}/>,
+    <Yours/>,
     <Add />,
     <History />,
   ]);
   const [bottomTabItemsActive] = React.useState([
-    <Yours1 catName={cat_name}/>,
+    <Yours1/>,
     <Add1 />,
     <History1 />,
   ]);
   return (
     <Tab.Navigator
-    catName={cat_name}
       screenOptions={{ headerShown: false, unmountOnBlur: true }}
       tabBar={({ state, descriptors, navigation }) => {
         const activeIndex = state.index;
@@ -132,7 +132,9 @@ function BottomTabsRoot({ navigation }) {
       <Tab.Screen
         name="AddYours"
         component={AddYours}
-        options={{ headerShown: true,
+        options={{ 
+          unmountOnBlur: true,
+          headerShown: true,
           headerLeft: () => (
             <Pressable
              onPress={() => navigation.navigate("MainView")}
@@ -166,7 +168,9 @@ function BottomTabsRoot({ navigation }) {
       <Tab.Screen
         name="AddAdd"
         component={AddAdd}
-        options={{ headerShown: true,
+        options={{ 
+          unmountOnBlur: true ,
+          headerShown: true,
           headerLeft: () => (
             <Pressable
              onPress={() => navigation.navigate("MainView")}
@@ -184,7 +188,9 @@ function BottomTabsRoot({ navigation }) {
       <Tab.Screen
         name="AddHistory"
         component={AddHistory}
-        options={{ headerShown: true,
+        options={{ 
+          unmountOnBlur: true ,
+          headerShown: true,
           headerLeft: () => (
             <Pressable
              onPress={() => navigation.navigate("MainView")}

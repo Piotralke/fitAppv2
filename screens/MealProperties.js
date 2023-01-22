@@ -7,10 +7,12 @@ const MealProperties = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const mid = route.params.id;
+  const [date] = useState(navigation.getState());
   const [meal, setMeal] = useState({});
   useEffect(() => {
     setMeal({});
-    console.log(mid)
+    console.log(mid);
+    console.log(date);
     db.collection('meals').doc(mid).get()
       .then(
         doc => {

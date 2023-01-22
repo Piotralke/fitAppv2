@@ -11,9 +11,10 @@ import {
 import { useNavigation, useRoute, useFocusEffect} from "@react-navigation/native";
 import {auth, db} from "../firebase.js";
 const AddYours = () => {
-  const [dataTest,setDataTest] =useState([]);
+  const [dataTest,setDataTest] = useState([]);
   const navigation = useNavigation();
-  const c = navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params
+  const [c] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.date.toLocaleDateString());
+  const [name] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.name);
   const uid = auth.currentUser?.uid;
   const route = useRoute();
   //const [cat, setCat] = useState(route.params.name);
@@ -33,11 +34,11 @@ const AddYours = () => {
       }).catch(error => {
         console.log(error);
       }); 
-  }, [c.date.toLocaleDateString()]);
+  }, [c,name]);
   return (
     <View style={styles.addHistory}>
       <View style={styles.list}>
-        <Text>{c.date.toString()}</Text>
+        <Text>{c}</Text>
         <ScrollView>
           {dataTest.map((item,index)=>{
             return (
