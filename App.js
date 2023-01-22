@@ -48,7 +48,7 @@ const Tab = createBottomTabNavigator();
 function DrawerRoot({ navigation }) {
   return (
     <Drawer.Navigator
-      screenOptions={{ headerShown: false, drawerStyle: { width: 207 } }}
+      screenOptions={{ headerShown: false, drawerStyle: { width: 207 },unmountOnBlur: true }}
       drawerContent={(props) => <Menu {...props} />}
     >
 

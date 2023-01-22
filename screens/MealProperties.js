@@ -2,17 +2,24 @@ import * as React from "react";
 import { StyleSheet, View, Text, Image, Pressable, TextInput, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState, useEffect } from "react";
-import { auth, db } from "../firebase.js";
+import { auth, db,firebase } from "../firebase.js";
+
 const MealProperties = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const mid = route.params.id;
-  const [date] = useState(navigation.getState());
+  const date = route.params.date;
+  const mealCategory = route.params.meal;
   const [meal, setMeal] = useState({});
+  const [grams, setGrams] = useState("");
+  const uid = auth.currentUser?.uid;
+  
+
   useEffect(() => {
     setMeal({});
     console.log(mid);
     console.log(date);
+    console.log(mealCategory)
     db.collection('meals').doc(mid).get()
       .then(
         doc => {
@@ -47,10 +54,22 @@ const MealProperties = () => {
           placeholder="Placeholder text"
           keyboardType="number-pad"
           keyboardShouldPersistTaps='handled'
+          onChangeText={text => setGrams(text)}
         />
         <Pressable
           style={styles.rectanglePressable}
-          onPress={() => navigation.navigate("MainView")}
+          onPress={async () => {
+            await db.collection('users').doc(uid).collection("daty").doc(date).set({},{merge: true})
+            await db.collection('users').doc(uid).collection("daty").doc(date).update({
+              [mealCategory]: firebase.firestore.FieldValue.arrayUnion({
+                mealId: mid,
+                grams: grams
+                })
+                
+            },{merge: true});
+            navigation.navigate("MainView")}
+          }
+            
         >
           <Text style={styles.add}>Add</Text>
         </Pressable>

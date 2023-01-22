@@ -1,21 +1,21 @@
-import React , {useState, useEffect} from "react";
-import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView, TouchableOpacity, LayoutAnimation, Alert, Button} from "react-native";
-
+import React, { useState, useEffect } from "react";
+import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView, TouchableOpacity, LayoutAnimation, Alert, Button } from "react-native";
+import { auth, db, firebase } from "../firebase.js";
 import {
   Datepicker as RNKDatepicker,
   Icon as RNKIcon,
 } from "@ui-kitten/components";
 import { useNavigation } from "@react-navigation/native";
-import {  
+import {
   ProgressChart,
 } from "react-native-chart-kit";
 
-const ExpandableComponent = ({ item, onClickFunction,date }) => {
+const ExpandableComponent = ({ item, onClickFunction, date }) => {
   //Custom Component for the Expandable List
   const [layoutHeight, setLayoutHeight] = useState(0);
   const navigation = useNavigation();
   useEffect(() => {
-    
+
     if (item.isExpanded) {
       setLayoutHeight(null);
     } else {
@@ -24,18 +24,18 @@ const ExpandableComponent = ({ item, onClickFunction,date }) => {
   }, [item.isExpanded]);
 
   return (
-    
-    <View tyle={{flex:1,top:"46%", marginBottom:"100%",width:"100%", marginHorizontal:"auto", alignItems:"center"}}>
+
+    <View tyle={{ flex: 1, top: "46%", marginBottom: "100%", width: "100%", marginHorizontal: "auto", alignItems: "center" }}>
       {/*Header of the Expandable List Item*/}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={onClickFunction}
         style={styles.header}>
-          <View style={styles.mainbuttons}>
-            <Text style={styles.headerText}>{item.category_name}</Text>
-            <TouchableOpacity style={[styles.settings1]} onPress={()=>navigation.navigate("BottomTabsRoot", {name: item.category_name, date:date })}>
-                <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-add-circle.png')} />
-            </TouchableOpacity>
+        <View style={styles.mainbuttons}>
+          <Text style={styles.headerText}>{item.category_name}</Text>
+          <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("BottomTabsRoot", { name: item.category_name, date: date })}>
+            <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-add-circle.png')} />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
       <View
@@ -48,7 +48,7 @@ const ExpandableComponent = ({ item, onClickFunction,date }) => {
           <TouchableOpacity
             key={key}
             style={styles.content}
-            onPress={() => Alert.alert(item.name, 'Calories: ' + item.Cal + '\nProtein: ' + item.Prot + '\nFat: ' + item.Fat + '\nCarbo: ' + item.Carb, [{text: "Ok"},{ text:"Delete", style:'destructive'}])}>
+            onPress={() => Alert.alert(item.name, 'Calories: ' + item.Cal + '\nProtein: ' + item.Prot + '\nFat: ' + item.Fat + '\nCarbo: ' + item.Carb, [{ text: "Ok" }, { text: "Delete", style: 'destructive' }])}>
             <Text style={styles.text}>
               {item.name}
             </Text>
@@ -62,16 +62,67 @@ const ExpandableComponent = ({ item, onClickFunction,date }) => {
 
 const MainView = () => {
   const [datePicker, setDatePicker] = useState(new Date());
+  const [meals, setMeals] = useState([]);
   const navigation = useNavigation();
   const [listDataSource, setListDataSource] = useState(CONTENT);
   const updateLayout = (index) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const array = [...listDataSource];
-      array[index]['isExpanded'] = !array[index]['isExpanded'];
+    array[index]['isExpanded'] = !array[index]['isExpanded'];
     setListDataSource(array);
   };
-  const colors = [ 'rgba(255, 0, 0,0.4)', 'rgba(238, 130, 238,0.4)', 'rgba(106, 90, 205,0.4)', 'rgba(60, 179, 113,0.4)', 'rgba(255, 172, 71 , 0.4)'];
-  const chartData={labels:["Calories","Protein","Fat","Carbo"],data:[1800/2000,123/452,555/643,76/120]};
+  const uid = auth.currentUser?.uid;
+  const colors = ['rgba(255, 0, 0,0.4)', 'rgba(238, 130, 238,0.4)', 'rgba(106, 90, 205,0.4)', 'rgba(60, 179, 113,0.4)', 'rgba(255, 172, 71 , 0.4)'];
+  const chartData = { labels: ["Calories", "Protein", "Fat", "Carbo"], data: [1800 / 2000, 123 / 452, 555 / 643, 76 / 120] };
+
+  useEffect(() => {
+    async function fetchData() {
+      console.log(datePicker.toLocaleDateString())
+      const list = [
+        {
+          isExpanded: false,
+          category_name: 'Breakfast',
+          subcategory: [],
+        },
+        {
+          isExpanded: false,
+          category_name: '2nd Breakfast',
+          subcategory: [],
+        },
+        {
+          isExpanded: false,
+          category_name: 'Lunch',
+          subcategory: [],
+        },
+        {
+          isExpanded: false,
+          category_name: 'Dinner',
+          subcategory: [],
+        },
+        {
+          isExpanded: false,
+          category_name: 'Supper',
+          subcategory: [],
+        }];
+      const z = await db.collection('users').doc(uid).collection("daty").doc(datePicker.toLocaleDateString()).get()
+      const x = z.data()
+      setMeals(x);
+      console.log(x)
+      list.forEach(element => {
+        console.log(x[element.category_name])
+        x[element.category_name].forEach(async el => {
+          console.log(el);
+          const y = await db.collection('meals').doc(el.mealId).get();
+          console.log(el);
+          console.log(y.data());
+        });
+        
+      });
+
+    }
+    fetchData();
+  }, [datePicker])
+
   return (
     <View style={styles.mainView} >
 
@@ -86,10 +137,10 @@ const MainView = () => {
         resizeMode="cover"
         source={require("../assets/frame-1.png")}
       />
-     
-      <View style={{flex:1,top:"46%", marginBottom:"100%",width:"100%", marginHorizontal:"auto", alignItems:"center"}}>
+
+      <View style={{ flex: 1, top: "46%", marginBottom: "100%", width: "100%", marginHorizontal: "auto", alignItems: "center" }}>
         <ScrollView>
-        {listDataSource.map((item, key) => (
+          {listDataSource.map((item, key) => (
             <ExpandableComponent
               key={item.category_name}
               onClickFunction={() => {
@@ -102,35 +153,36 @@ const MainView = () => {
         </ScrollView>
       </View>
       <View style={styles.chart}>
-      <ProgressChart data={chartData}  width={400}
-      height={220}
-      strokeWidth={16}
-      radius={32}  hideLegend={false} chartConfig={{backgroundColor: "#967474",
-      backgroundGradientFrom: "#967474",
-      backgroundGradientTo: "#967474",
-      decimalPlaces: 2, // optional, defaults to 2dp
-      color: (opacity = 1, index) => {
-        return index != undefined ? colors[index]:`rgba(255, 255, 255, ${opacity})`;
-      },
-      labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-      style: {
-        borderRadius: 16
-      },
-      }}/>  
-      <Text style={{left:"12%"}}>Cal:1800/2000 Prot: 27/100 Fat: 43/50 Carbo:189/300</Text>    
+        <ProgressChart data={chartData} width={400}
+          height={220}
+          strokeWidth={16}
+          radius={32} hideLegend={false} chartConfig={{
+            backgroundColor: "#967474",
+            backgroundGradientFrom: "#967474",
+            backgroundGradientTo: "#967474",
+            decimalPlaces: 2, // optional, defaults to 2dp
+            color: (opacity = 1, index) => {
+              return index != undefined ? colors[index] : `rgba(255, 255, 255, ${opacity})`;
+            },
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            style: {
+              borderRadius: 16
+            },
+          }} />
+        <Text style={{ left: "12%" }}>Cal:1800/2000 Prot: 27/100 Fat: 43/50 Carbo:189/300</Text>
       </View>
-      
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  chart:{
+  chart: {
     position: "absolute",
     top: "5%",
     left: "-10%"
   },
-  addMeal:{
+  addMeal: {
     position: "relative",
     justifyContent: "right"
   },
@@ -151,7 +203,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#968675",
     borderColor: "#91c789",
     left: 10,
-    borderLeftWidth:10,
+    borderLeftWidth: 10,
     width: "100%",
   },
   frameIcon: {
@@ -207,7 +259,7 @@ const styles = StyleSheet.create({
     maxHeight: "100%",
   },
   settings1: {
-    position: "relative", 
+    position: "relative",
   },
 });
 
@@ -216,40 +268,40 @@ const CONTENT = [
     isExpanded: false,
     category_name: 'Breakfast',
     subcategory: [
-      { id: 1, name: 'Parówa',Cal:100,Prot:50,Fat:20,Carb:150 },
-      { id: 3, name: 'Sub Cat 3',Cal:100,Prot:50,Fat:20,Carb:150 },
+      { id: 1, name: 'Parówa', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
+      { id: 3, name: 'Sub Cat 3', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
     ],
   },
   {
     isExpanded: false,
     category_name: '2nd Breakfast',
     subcategory: [
-      { id: 4, name: 'Sub Cat 4',Cal:100,Prot:50,Fat:20,Carb:150 },
-      { id: 5, name: 'Sub Cat 5',Cal:100,Prot:50,Fat:20,Carb:150 },
+      { id: 4, name: 'Sub Cat 4', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
+      { id: 5, name: 'Sub Cat 5', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
     ],
   },
   {
     isExpanded: false,
     category_name: 'Lunch',
     subcategory: [
-      { id: 7, name: 'Sub Cat 7',Cal:100,Prot:50,Fat:20,Carb:150 },
-      { id: 9, name: 'Sub Cat 9',Cal:100,Prot:50,Fat:20,Carb:150 },
+      { id: 7, name: 'Sub Cat 7', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
+      { id: 9, name: 'Sub Cat 9', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
     ],
   },
   {
     isExpanded: false,
     category_name: 'Dinner',
     subcategory: [
-      { id: 10, name: 'Sub Cat 10',Cal:100,Prot:50,Fat:20,Carb:150 },
-      { id: 12, name: 'Sub Cat 2',Cal:100,Prot:50,Fat:20,Carb:150 },
+      { id: 10, name: 'Sub Cat 10', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
+      { id: 12, name: 'Sub Cat 2', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
     ],
   },
   {
     isExpanded: false,
     category_name: 'Supper',
     subcategory: [
-      { id: 13, val: 'Sub Cat 13',Cal:100,Prot:50,Fat:20,Carb:150 },
-      { id: 15, val: 'Sub Cat 5',Cal:100,Prot:50,Fat:20,Carb:150 },
+      { id: 13, val: 'Sub Cat 13', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
+      { id: 15, val: 'Sub Cat 5', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
     ],
   }];
 

@@ -44,7 +44,7 @@ const AddYours = () => {
             return (
               <View style={styles.meal} key={index}>
                   <TouchableOpacity onPress={()=>{
-                    navigation.navigate("MealProperties",{id: item.id})
+                    navigation.navigate("MealProperties",{id: item.id, date: c, meal: name})
                   }}>
                     <Text style={styles.one}>{item.data().name}</Text>
                   </TouchableOpacity>
