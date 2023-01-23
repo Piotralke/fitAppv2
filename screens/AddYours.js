@@ -13,7 +13,7 @@ import {auth, db} from "../firebase.js";
 const AddYours = () => {
   const [dataTest,setDataTest] = useState([]);
   const navigation = useNavigation();
-  const [c] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.date.toLocaleDateString());
+  const [c] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.date);
   const [name] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.name);
   const uid = auth.currentUser?.uid;
   const route = useRoute();

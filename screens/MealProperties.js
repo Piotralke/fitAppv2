@@ -67,7 +67,7 @@ const MealProperties = () => {
                 })
                 
             },{merge: true});
-            navigation.navigate("MainView")}
+            navigation.navigate("MainView",{date:date})}
           }
             
         >

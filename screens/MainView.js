@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect  } from "react";
 import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView, TouchableOpacity, LayoutAnimation, Alert, Button } from "react-native";
 import { auth, db, firebase } from "../firebase.js";
 import {
   Datepicker as RNKDatepicker,
   Icon as RNKIcon,
 } from "@ui-kitten/components";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute  } from "@react-navigation/native";
 import {
   ProgressChart,
 } from "react-native-chart-kit";
@@ -33,7 +33,7 @@ const ExpandableComponent = ({ item, onClickFunction, date }) => {
         style={styles.header}>
         <View style={styles.mainbuttons}>
           <Text style={styles.headerText}>{item.category_name}</Text>
-          <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("BottomTabsRoot", { name: item.category_name, date: date })}>
+          <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("BottomTabsRoot", { name: item.category_name, date: date.toLocaleDateString() })}>
             <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-add-circle.png')} />
           </TouchableOpacity>
         </View>
@@ -48,7 +48,7 @@ const ExpandableComponent = ({ item, onClickFunction, date }) => {
           <TouchableOpacity
             key={key}
             style={styles.content}
-            onPress={() => Alert.alert(item.name, 'Calories: ' + item.Cal + '\nProtein: ' + item.Prot + '\nFat: ' + item.Fat + '\nCarbo: ' + item.Carb, [{ text: "Ok" }, { text: "Delete", style: 'destructive' }])}>
+            onPress={() => Alert.alert(item.name, 'Calories: ' + item.Cal.toFixed(1) + '\nProtein: ' + item.Prot.toFixed(1) + '\nFat: ' + item.Fat.toFixed(1) + '\nCarbo: ' + item.Carb.toFixed(1), [{ text: "Ok" }, { text: "Delete", style: 'destructive' }])}>
             <Text style={styles.text}>
               {item.name}
             </Text>
@@ -61,9 +61,15 @@ const ExpandableComponent = ({ item, onClickFunction, date }) => {
 };
 
 const MainView = () => {
-  const [datePicker, setDatePicker] = useState(new Date());
-  const [meals, setMeals] = useState([]);
   const navigation = useNavigation();
+  const route = useRoute();
+  const [datePicker, setDatePicker] = useState(()=>{
+    if(route.params){
+      const dateArr = route.params.date.split(".");
+      return new Date(dateArr[2],dateArr[1]-1,dateArr[0])
+    }
+    return new Date()  
+  });
   const [listDataSource, setListDataSource] = useState(CONTENT);
   const updateLayout = (index) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -72,12 +78,38 @@ const MainView = () => {
     setListDataSource(array);
   };
   const uid = auth.currentUser?.uid;
+  const [maximums,setMaximums] =useState({
+      calories:2000,
+      proteins:50,
+      fat:70,
+      carbo:260
+  }) 
   const colors = ['rgba(255, 0, 0,0.4)', 'rgba(238, 130, 238,0.4)', 'rgba(106, 90, 205,0.4)', 'rgba(60, 179, 113,0.4)', 'rgba(255, 172, 71 , 0.4)'];
-  const chartData = { labels: ["Calories", "Protein", "Fat", "Carbo"], data: [1800 / 2000, 123 / 452, 555 / 643, 76 / 120] };
+  const [chartData, setChartData] = useState({labels:["Calories", "Protein", "Fat", "Carbo"], 
+  data: [0,0,0,0]});
+  const [nutritions,setNutritions] = useState([0,0,0,0])
+
+  useEffect(()=>{
+    async function fetchData(){
+      
+    console.log("aaaaaa");
+    const ref = db.collection('users').doc(uid);
+    const doc = await ref.get();
+    if(doc.exists)
+    {
+      console.log(doc.data())
+      setMaximums(doc.data());
+    }
+    }
+    
+    fetchData()
+  },[])
 
   useEffect(() => {
     async function fetchData() {
-      console.log(datePicker.toLocaleDateString())
+      setChartData({labels:["Calories", "Protein", "Fat", "Carbo"], 
+      data: [0,0,0,0]})
+      setNutritions([0,0,0,0])
       const list = [
         {
           isExpanded: false,
@@ -104,21 +136,53 @@ const MainView = () => {
           category_name: 'Supper',
           subcategory: [],
         }];
+        setListDataSource(list)
       const z = await db.collection('users').doc(uid).collection("daty").doc(datePicker.toLocaleDateString()).get()
+      const y = await db.collection('meals').get();
+      const idArray = y.docs.map(doc=>doc.id);
+      const dataArray = y.docs.map(doc=>doc.data());
       const x = z.data()
-      setMeals(x);
-      console.log(x)
-      list.forEach(element => {
-        console.log(x[element.category_name])
-        x[element.category_name].forEach(async el => {
-          console.log(el);
-          const y = await db.collection('meals').doc(el.mealId).get();
-          console.log(el);
-          console.log(y.data());
+      let sumCal = 0;
+      let sumProt = 0;
+      let sumFat = 0;
+      let sumCarb = 0;
+      if(x)
+      {
+        list.forEach(element => {
+          if(x.hasOwnProperty(element.category_name))
+          {
+            x[element.category_name].forEach(async el => {
+              const meal = dataArray.at(idArray.indexOf(el.mealId))
+              const multiply = el.grams/100;
+              element.subcategory.push({
+                id: x[element.category_name].indexOf(el),
+                name: meal.name,
+                Cal: meal.calories*multiply,
+                Prot: meal.protein*multiply,
+                Fat: meal.fat*multiply,
+                Carb: meal.carbo*multiply
+              })
+              sumCal+=meal.calories*multiply
+              sumProt+=meal.protein*multiply
+              sumFat+=meal.fat*multiply
+              sumCarb+=meal.carbo*multiply
+            });
+          }
+          
         });
+       
+        setChartData({
+          labels:["Calories", "Protein", "Fat", "Carbo"], 
+          data: [sumCal/maximums.calories<1.0?sumCal/maximums.calories:1.0,sumProt/ maximums.proteins<1.0?sumProt/ maximums.proteins:1.0,sumFat/ maximums.fat<1.0?sumFat/ maximums.fat:1.0,sumCarb/maximums.carbo<1.0?sumCarb/maximums.carbo:1.0]
+        })
+        setNutritions([sumCal,sumProt,sumFat,sumCarb])
+        console.log(list)
+        setListDataSource(list)
         
-      });
-
+      }
+      
+      console.log("maximums")
+      console.log(maximums)
     }
     fetchData();
   }, [datePicker])
@@ -127,6 +191,7 @@ const MainView = () => {
     <View style={styles.mainView} >
 
       <RNKDatepicker
+        style = {{left: "-10%"}}
         accessoryLeft={<RNKIcon name="calendar-outline" pack="material" />}
         date={datePicker}
         onSelect={setDatePicker}
@@ -169,7 +234,10 @@ const MainView = () => {
               borderRadius: 16
             },
           }} />
-        <Text style={{ left: "12%" }}>Cal:1800/2000 Prot: 27/100 Fat: 43/50 Carbo:189/300</Text>
+        <Text style={{ position:"relative", left: "12%" }}>Cal:{nutritions[0].toFixed(1)}/{maximums.calories}</Text>
+        <Text style={{ position:"relative",left: "12%" }}>Prot: {nutritions[1].toFixed(1)}/{maximums.proteins}</Text>
+        <Text style={{ position:"relative", left: "12%" }}>Fat: {nutritions[2].toFixed(1)}/{maximums.fat}</Text>
+        <Text style={{ position:"relative",left: "12%" }}>Carbo:{nutritions[3].toFixed(1)}/{maximums.carbo}</Text>
       </View>
 
     </View>
@@ -179,7 +247,7 @@ const MainView = () => {
 const styles = StyleSheet.create({
   chart: {
     position: "absolute",
-    top: "5%",
+    top: "0%",
     left: "-10%"
   },
   addMeal: {
@@ -267,42 +335,27 @@ const CONTENT = [
   {
     isExpanded: false,
     category_name: 'Breakfast',
-    subcategory: [
-      { id: 1, name: 'Parówa', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-      { id: 3, name: 'Sub Cat 3', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-    ],
+    subcategory: [],
   },
   {
     isExpanded: false,
     category_name: '2nd Breakfast',
-    subcategory: [
-      { id: 4, name: 'Sub Cat 4', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-      { id: 5, name: 'Sub Cat 5', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-    ],
+    subcategory: [],
   },
   {
     isExpanded: false,
     category_name: 'Lunch',
-    subcategory: [
-      { id: 7, name: 'Sub Cat 7', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-      { id: 9, name: 'Sub Cat 9', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-    ],
+    subcategory: [],
   },
   {
     isExpanded: false,
     category_name: 'Dinner',
-    subcategory: [
-      { id: 10, name: 'Sub Cat 10', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-      { id: 12, name: 'Sub Cat 2', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-    ],
+    subcategory: [],
   },
   {
     isExpanded: false,
     category_name: 'Supper',
-    subcategory: [
-      { id: 13, val: 'Sub Cat 13', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-      { id: 15, val: 'Sub Cat 5', Cal: 100, Prot: 50, Fat: 20, Carb: 150 },
-    ],
+    subcategory: [],
   }];
 
 export default MainView;

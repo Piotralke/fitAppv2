@@ -79,6 +79,7 @@ function DrawerRoot({ navigation }) {
 function BottomTabsRoot({ navigation }) {
   const route = useRoute();
   const cat_name = route.params.name;
+  const date = route.params.date;
   console.log(cat_name);
   console.log(route.params.date);
   
@@ -137,7 +138,7 @@ function BottomTabsRoot({ navigation }) {
           headerShown: true,
           headerLeft: () => (
             <Pressable
-             onPress={() => navigation.navigate("MainView")}
+             onPress={() => navigation.navigate("MainView", {date: date})}
             >
             <Image
             style={styles.back}
@@ -173,7 +174,7 @@ function BottomTabsRoot({ navigation }) {
           headerShown: true,
           headerLeft: () => (
             <Pressable
-             onPress={() => navigation.navigate("MainView")}
+             onPress={() => navigation.navigate("MainView", {date: date})}
             >
             <Image
             style={styles.back}
@@ -193,7 +194,7 @@ function BottomTabsRoot({ navigation }) {
           headerShown: true,
           headerLeft: () => (
             <Pressable
-             onPress={() => navigation.navigate("MainView")}
+             onPress={() => navigation.navigate("MainView", {date: date})}
             >
             <Image
             style={styles.back}

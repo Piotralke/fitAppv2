@@ -18,7 +18,7 @@ const Register = () => {
       .then(userCredentials => {
         const user = userCredentials.user;
         console.log(user.email);
-        db.collection('users').doc(user.uid).set({'email': user.email})
+        db.collection('users').doc(user.uid).set({'email': user.email, "calories": 2000, "proteins": 50, "fat": 70, "carbo":260})
       })
       .catch(error => alert(error.message))
       
