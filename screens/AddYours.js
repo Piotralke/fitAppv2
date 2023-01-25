@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
+  Pressable,
 } from "react-native";
 import { useNavigation, useRoute, useFocusEffect} from "@react-navigation/native";
 import {auth, db} from "../firebase.js";
@@ -17,13 +18,43 @@ const AddYours = () => {
   const [name] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.name);
   const uid = auth.currentUser?.uid;
   const route = useRoute();
+  const [search,setSearch] = useState("")
+
   //const [cat, setCat] = useState(route.params.name);
+useEffect(()=>{
+  navigation.setOptions({
+    headerTitle: () => (
+      <TextInput 
+      style={styles.search} 
+        placeholder="Search"
+        keyboardType="default"
+        placeholderTextColor="#fff"
+        onChangeText={text=>setSearch(text)}
+      />
+    ),
+    headerRight: () =>(
+      <Pressable onPress={() => navigation.navigate("Scan",{name:name,date:c})}>
+      <Image
+      style={styles.scan}
+      resizeMode="cover"
+      source={require("../assets/vector4.png")}
+      />
+      </Pressable>
+    ),
+  })
+},[]);
+
+useEffect(()=>{
+  console.log(search)
+},[search])
   useEffect(() => {
     console.log(c);
     console.log("chuj");
    // console.log(this.props.catName);
     setDataTest([]);
-    db.collection('meals').get()
+    if(search.length===0)
+    {
+      db.collection('meals').get()
       .then((querySnapshot)=>{
         querySnapshot.forEach((doc)=>{
           if(doc.data().creator.trim()===uid)
@@ -34,7 +65,22 @@ const AddYours = () => {
       }).catch(error => {
         console.log(error);
       }); 
-  }, [c,name]);
+    }else{
+      db.collection('meals').get()
+      .then((querySnapshot)=>{
+        querySnapshot.forEach((doc)=>{
+          
+          if(doc.data().name.toUpperCase().indexOf(search.toUpperCase())>-1)
+          {
+            setDataTest(dataTest=>[...dataTest, doc])
+          }
+        })
+      }).catch(error => {
+        console.log(error);
+      }); 
+    }
+    
+  }, [c,name,search]);
   return (
     <View style={styles.addHistory}>
       <View style={styles.list}>
@@ -96,6 +142,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding:5,
+  },
+  search:{
+    height: 30,
   },
   addHistory: {
     backgroundColor: "#967474",

@@ -1,6 +1,6 @@
 const Stack = createNativeStackNavigator();
 import * as React from "react";
-import { NavigationContainer} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import Login from "./screens/Login";
 import Scan from "./screens/Scan";
@@ -48,31 +48,35 @@ const Tab = createBottomTabNavigator();
 function DrawerRoot({ navigation }) {
   return (
     <Drawer.Navigator
-      screenOptions={{ headerShown: false, drawerStyle: { width: 207 },unmountOnBlur: true }}
+      screenOptions={{ headerShown: false, drawerStyle: { width: 207 }, unmountOnBlur: true }}
       drawerContent={(props) => <Menu {...props} />}
     >
 
-      <Drawer.Screen name="BottomTabsRoot" 
-      component={BottomTabsRoot} 
-      screenOptions={{ unmountOnBlur: true }}
+      <Drawer.Screen name="BottomTabsRoot"
+        component={BottomTabsRoot}
+        screenOptions={{ unmountOnBlur: true }}
       />
-      
+
       <Stack.Screen
         name="Settings"
         component={Settings1}
-        options={{ headerShown: true,
+        options={{
+          headerShown: true,
           title: "",
-          headerStyle: {backgroundColor:"#91c789"}}}
+          headerStyle: { backgroundColor: "#91c789" }
+        }}
       />
 
       <Stack.Screen
         name="MainView"
         component={MainView}
-        options={{ headerShown: true,
+        options={{
+          headerShown: true,
           title: "",
-         headerStyle: {backgroundColor:"#91c789"}}}
+          headerStyle: { backgroundColor: "#91c789" }
+        }}
       />
-      
+
     </Drawer.Navigator>
   );
 }
@@ -80,21 +84,21 @@ function BottomTabsRoot({ navigation }) {
   const route = useRoute();
   const cat_name = route.params.name;
   const date = route.params.date;
-  console.log(cat_name);
-  console.log(route.params.date);
-  
+  const [search, setSearch] = React.useState("dupa")
+
   const [bottomTabItemsNormal] = React.useState([
-    <Yours/>,
+    <Yours />,
     <Add />,
     <History />,
   ]);
   const [bottomTabItemsActive] = React.useState([
-    <Yours1/>,
+    <Yours1 />,
     <Add1 />,
     <History1 />,
   ]);
   return (
     <Tab.Navigator
+
       screenOptions={{ headerShown: false, unmountOnBlur: true }}
       tabBar={({ state, descriptors, navigation }) => {
         const activeIndex = state.index;
@@ -115,7 +119,8 @@ function BottomTabsRoot({ navigation }) {
                   onPress={() => {
                     navigation.navigate({
                       name: state.routes[index].name,
-                      catName: {cat_name},
+                      catName: { cat_name },
+
                       merge: true,
                     });
                   }}
@@ -133,94 +138,68 @@ function BottomTabsRoot({ navigation }) {
       <Tab.Screen
         name="AddYours"
         component={AddYours}
-        options={{ 
+        options={{
           unmountOnBlur: true,
           headerShown: true,
           headerLeft: () => (
             <Pressable
-             onPress={() => navigation.navigate("MainView", {date: date})}
+              onPress={() => navigation.navigate("MainView", { date: date })}
             >
-            <Image
-            style={styles.back}
-            resizeMode="cover"
-            source={require("./assets/-icon-chevron-down14.png")}
-        />
-          </Pressable>
-          ),
-          headerTitle: () => (
-          <TextInput 
-          style={styles.search} 
-            placeholder="Search"
-            keyboardType="default"
-            placeholderTextColor="#fff"
-          />
-          ),
-          headerRight: () =>(
-            <Pressable onPress={() => navigation.navigate("Scan")}>
-            <Image
-            style={styles.scan}
-            resizeMode="cover"
-            source={require("./assets/vector4.png")}
-            />
+              <Image
+                style={styles.back}
+                resizeMode="cover"
+                source={require("./assets/-icon-chevron-down14.png")}
+              />
             </Pressable>
           ),
-          headerStyle: {backgroundColor:"#91c789"}}}
+
+
+          headerStyle: { backgroundColor: "#91c789" }
+        }
+        }
       />
       <Tab.Screen
         name="AddAdd"
         component={AddAdd}
-        options={{ 
-          unmountOnBlur: true ,
+        initialParams={{barcode:""}}
+        options={{
+          unmountOnBlur: true,
           headerShown: true,
           headerLeft: () => (
             <Pressable
-             onPress={() => navigation.navigate("MainView", {date: date})}
+              onPress={() => navigation.navigate("MainView", { date: date })}
             >
-            <Image
-            style={styles.back}
-          resizeMode="cover"
-          source={require("./assets/-icon-chevron-down14.png")}
-        />
-          </Pressable>
+              <Image
+                style={styles.back}
+                resizeMode="cover"
+                source={require("./assets/-icon-chevron-down14.png")}
+              />
+            </Pressable>
           ),
           headerTitle: "",
-          headerStyle: {backgroundColor:"#91c789"}}}
+          headerStyle: { backgroundColor: "#91c789" }
+        }}
       />
       <Tab.Screen
         name="AddHistory"
         component={AddHistory}
-        options={{ 
-          unmountOnBlur: true ,
+        options={{
+          unmountOnBlur: true,
           headerShown: true,
           headerLeft: () => (
             <Pressable
-             onPress={() => navigation.navigate("MainView", {date: date})}
+              onPress={() => navigation.navigate("MainView", { date: date })}
             >
-            <Image
-            style={styles.back}
-          resizeMode="cover"
-          source={require("./assets/-icon-chevron-down14.png")}
-        />
-          </Pressable>
-          ),
-          headerTitle: () => (
-          <TextInput  
-            style={styles.search}
-            placeholder="Search"
-            keyboardType="default"
-            placeholderTextColor="#fff"
-          />
-          ),
-          headerRight: () =>(
-            <Pressable onPress={() => navigation.navigate("Scan")}>
-            <Image
-            style={styles.scan}
-            resizeMode="cover"
-            source={require("./assets/vector4.png")}
-            />
+              <Image
+                style={styles.back}
+                resizeMode="cover"
+                source={require("./assets/-icon-chevron-down14.png")}
+              />
             </Pressable>
           ),
-          headerStyle: {backgroundColor:"#91c789"}}}
+
+          headerStyle: { backgroundColor: "#91c789" }
+        }}
       />
     </Tab.Navigator>
   );
@@ -279,8 +258,9 @@ const App = () => {
                 name="Scan"
                 component={Scan}
                 options={{ headerShown: false }}
+                screenOptions={{ unmountOnBlur: true }}
               />
-              
+
               <Stack.Screen
                 name="Register"
                 component={Register}
@@ -290,33 +270,41 @@ const App = () => {
               <Stack.Screen
                 name="Steps"
                 component={Steps}
-                options={{ headerShown: true,
+                options={{
+                  headerShown: true,
                   title: "",
-                  headerStyle: {backgroundColor:"#91c789"}}}
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
               />
 
-              
+
               <Stack.Screen
                 name="MealProperties"
                 component={MealProperties}
-                options={{ headerShown: true,
+                options={{
+                  headerShown: true,
                   title: "",
-                  headerStyle: {backgroundColor:"#91c789"}}}
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
               />
-              
+
               <Stack.Screen
                 name="AddMakeNew"
                 component={AddMakeNew}
-                options={{ headerShown: true,
+                options={{
+                  headerShown: true,
                   title: "",
-                  headerStyle: {backgroundColor:"#91c789"}}}
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
               />
               <Stack.Screen
                 name="AddSearch"
                 component={AddSearch}
-                options={{ headerShown: true,
+                options={{
+                  headerShown: true,
                   title: "",
-                  headerStyle: {backgroundColor:"#91c789"}}}
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
               />
             </Stack.Navigator>
           ) : null}
@@ -331,13 +319,13 @@ const styles = StyleSheet.create({
     height: 55,
   },
   scan: {
-    marginRight:12,
+    marginRight: 12,
   },
   back: {
-    marginLeft:12,
-    marginTop:4,
+    marginLeft: 12,
+    marginTop: 4,
   },
-  search:{
+  search: {
     height: 30,
   },
   rectanglePressable: {

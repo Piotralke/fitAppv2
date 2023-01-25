@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useRoute } from "@react-navigation/native";
 import {auth, db} from "../firebase.js";
 import { useState, useEffect } from "react";
 const AddAdd = () => {
@@ -20,6 +20,13 @@ const AddAdd = () => {
   const [barcode,setBarcode] =useState("");
   const navigation = useNavigation();
   const uid = auth.currentUser?.uid;
+  const route = useRoute();
+  const scannedBarcode = route.params.barcode;
+  const [c] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.date);
+  const [cat_name] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.name);
+
+  useEffect(()=>{
+  },[])
   return (
     <View style={styles.addAdd}>
       <View style={styles.groupView}>
@@ -67,9 +74,10 @@ const AddAdd = () => {
           placeholder="Placeholder text"
           keyboardType="default"
           onChangeText={text => setBarcode(text)}
+          value={scannedBarcode?scannedBarcode:""}
          />
 
-            <Pressable onPress={() => navigation.navigate("Scan")}>
+            <Pressable onPress={() => navigation.navigate("Scan",{name:cat_name,date:c})}>
             <Image
             style={styles.scan}
             resizeMode="cover"

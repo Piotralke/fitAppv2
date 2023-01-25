@@ -9,13 +9,15 @@ import { useNavigation, useRoute  } from "@react-navigation/native";
 import {
   ProgressChart,
 } from "react-native-chart-kit";
-
-const ExpandableComponent = ({ item, onClickFunction, date }) => {
+const uid = auth.currentUser?.uid;
+let bool =  true
+const ExpandableComponent = ({ item, onClickFunction, date, func }) => {
   //Custom Component for the Expandable List
   const [layoutHeight, setLayoutHeight] = useState(0);
   const navigation = useNavigation();
+  
   useEffect(() => {
-
+    
     if (item.isExpanded) {
       setLayoutHeight(null);
     } else {
@@ -44,13 +46,38 @@ const ExpandableComponent = ({ item, onClickFunction, date }) => {
           overflow: 'hidden',
         }}>
         {/*Content under the header of the Expandable List Item*/}
-        {item.subcategory.map((item, key) => (
+        {item.subcategory.map((meal, key) => (
           <TouchableOpacity
             key={key}
             style={styles.content}
-            onPress={() => Alert.alert(item.name, 'Calories: ' + item.Cal.toFixed(1) + '\nProtein: ' + item.Prot.toFixed(1) + '\nFat: ' + item.Fat.toFixed(1) + '\nCarbo: ' + item.Carb.toFixed(1), [{ text: "Ok" }, { text: "Delete", style: 'destructive' }])}>
+            onPress={() => Alert.alert(meal.name, 'Calories: ' + 
+            meal.Cal.toFixed(1) + '\nProtein: ' + 
+            meal.Prot.toFixed(1) + '\nFat: ' + 
+            meal.Fat.toFixed(1) + '\nCarbo: ' + 
+            meal.Carb.toFixed(1), 
+            [{ text: "Ok",}, 
+            { text: "Delete", 
+            style: 'destructive',
+            onPress: async ()=>{
+              let array = await db.collection('users').doc(uid).collection("daty").doc(date.toLocaleDateString()).get();
+              let data = array.data();
+              console.log(data)
+              console.log(data[item.category_name].length)
+              let newArray
+              if(data[item.category_name].length==1)
+              {
+                  newArray=[]
+              }
+              else
+                newArray = data[item.category_name].splice(meal.id-1,1);
+              console.log(newArray)
+              data[item.category_name] = newArray ;
+              console.log(data)
+              db.collection('users').doc(uid).collection("daty").doc(date.toLocaleDateString()).set(data);
+              func()
+            }  }])}>
             <Text style={styles.text}>
-              {item.name}
+              {meal.name}
             </Text>
             <View style={styles.separator} />
           </TouchableOpacity>
@@ -90,7 +117,7 @@ const MainView = () => {
   const [nutritions,setNutritions] = useState([0,0,0,0])
 
   useEffect(()=>{
-    async function fetchData(){
+    async function fetch(){
       
     console.log("aaaaaa");
     const ref = db.collection('users').doc(uid);
@@ -102,91 +129,91 @@ const MainView = () => {
     }
     }
     
-    fetchData()
+    fetch()
   },[])
 
   useEffect(() => {
-    async function fetchData() {
-      setChartData({labels:["Calories", "Protein", "Fat", "Carbo"], 
-      data: [0,0,0,0]})
-      setNutritions([0,0,0,0])
-      const list = [
-        {
-          isExpanded: false,
-          category_name: 'Breakfast',
-          subcategory: [],
-        },
-        {
-          isExpanded: false,
-          category_name: '2nd Breakfast',
-          subcategory: [],
-        },
-        {
-          isExpanded: false,
-          category_name: 'Lunch',
-          subcategory: [],
-        },
-        {
-          isExpanded: false,
-          category_name: 'Dinner',
-          subcategory: [],
-        },
-        {
-          isExpanded: false,
-          category_name: 'Supper',
-          subcategory: [],
-        }];
-        setListDataSource(list)
-      const z = await db.collection('users').doc(uid).collection("daty").doc(datePicker.toLocaleDateString()).get()
-      const y = await db.collection('meals').get();
-      const idArray = y.docs.map(doc=>doc.id);
-      const dataArray = y.docs.map(doc=>doc.data());
-      const x = z.data()
-      let sumCal = 0;
-      let sumProt = 0;
-      let sumFat = 0;
-      let sumCarb = 0;
-      if(x)
-      {
-        list.forEach(element => {
-          if(x.hasOwnProperty(element.category_name))
-          {
-            x[element.category_name].forEach(async el => {
-              const meal = dataArray.at(idArray.indexOf(el.mealId))
-              const multiply = el.grams/100;
-              element.subcategory.push({
-                id: x[element.category_name].indexOf(el),
-                name: meal.name,
-                Cal: meal.calories*multiply,
-                Prot: meal.protein*multiply,
-                Fat: meal.fat*multiply,
-                Carb: meal.carbo*multiply
-              })
-              sumCal+=meal.calories*multiply
-              sumProt+=meal.protein*multiply
-              sumFat+=meal.fat*multiply
-              sumCarb+=meal.carbo*multiply
-            });
-          }
-          
-        });
-       
-        setChartData({
-          labels:["Calories", "Protein", "Fat", "Carbo"], 
-          data: [sumCal/maximums.calories<1.0?sumCal/maximums.calories:1.0,sumProt/ maximums.proteins<1.0?sumProt/ maximums.proteins:1.0,sumFat/ maximums.fat<1.0?sumFat/ maximums.fat:1.0,sumCarb/maximums.carbo<1.0?sumCarb/maximums.carbo:1.0]
-        })
-        setNutritions([sumCal,sumProt,sumFat,sumCarb])
-        console.log(list)
-        setListDataSource(list)
-        
-      }
-      
-      console.log("maximums")
-      console.log(maximums)
-    }
+    
     fetchData();
   }, [datePicker])
-
+  async function fetchData() {
+    setChartData({labels:["Calories", "Protein", "Fat", "Carbo"], 
+    data: [0,0,0,0]})
+    setNutritions([0,0,0,0])
+    const list = [
+      {
+        isExpanded: false,
+        category_name: 'Breakfast',
+        subcategory: [],
+      },
+      {
+        isExpanded: false,
+        category_name: '2nd Breakfast',
+        subcategory: [],
+      },
+      {
+        isExpanded: false,
+        category_name: 'Lunch',
+        subcategory: [],
+      },
+      {
+        isExpanded: false,
+        category_name: 'Dinner',
+        subcategory: [],
+      },
+      {
+        isExpanded: false,
+        category_name: 'Supper',
+        subcategory: [],
+      }];
+      setListDataSource(list)
+    const z = await db.collection('users').doc(uid).collection("daty").doc(datePicker.toLocaleDateString()).get()
+    const y = await db.collection('meals').get();
+    const idArray = y.docs.map(doc=>doc.id);
+    const dataArray = y.docs.map(doc=>doc.data());
+    const x = z.data()
+    let sumCal = 0;
+    let sumProt = 0;
+    let sumFat = 0;
+    let sumCarb = 0;
+    if(x)
+    {
+      list.forEach(element => {
+        if(x.hasOwnProperty(element.category_name))
+        {
+          x[element.category_name].forEach(async el => {
+            const meal = dataArray.at(idArray.indexOf(el.mealId))
+            const multiply = el.grams/100;
+            element.subcategory.push({
+              id: x[element.category_name].indexOf(el),
+              name: meal.name,
+              Cal: meal.calories*multiply,
+              Prot: meal.protein*multiply,
+              Fat: meal.fat*multiply,
+              Carb: meal.carbo*multiply
+            })
+            sumCal+=meal.calories*multiply
+            sumProt+=meal.protein*multiply
+            sumFat+=meal.fat*multiply
+            sumCarb+=meal.carbo*multiply
+          });
+        }
+        
+      });
+     
+      setChartData({
+        labels:["Calories", "Protein", "Fat", "Carbo"], 
+        data: [sumCal/maximums.calories<1.0?sumCal/maximums.calories:1.0,sumProt/ maximums.proteins<1.0?sumProt/ maximums.proteins:1.0,sumFat/ maximums.fat<1.0?sumFat/ maximums.fat:1.0,sumCarb/maximums.carbo<1.0?sumCarb/maximums.carbo:1.0]
+      })
+      setNutritions([sumCal,sumProt,sumFat,sumCarb])
+      console.log(list)
+      setListDataSource(list)
+      
+    }
+    
+    console.log("maximums")
+    console.log(maximums)
+  }
   return (
     <View style={styles.mainView} >
 
@@ -213,6 +240,7 @@ const MainView = () => {
               }}
               item={item}
               date={datePicker}
+              func = {fetchData}
             />
           ))}
         </ScrollView>

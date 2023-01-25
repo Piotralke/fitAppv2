@@ -1,13 +1,17 @@
 import * as React from "react";
 import { Text, Image, StyleSheet, View, Pressable, Button } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useState, useEffect } from 'react';
-
+import { auth, db, firebase } from "../firebase.js";
+import { QuerySnapshot } from "firebase/firestore";
 const Scan = () => {
   const navigation = useNavigation();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const route = useRoute();
+  const name = route.params.name;
+  const date = route.params.date;
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -19,10 +23,27 @@ const Scan = () => {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-  };
+    console.log("skaaaaaaaaan")
+    let bool = false;
+    
+    db.collection("meals").get().then(queryS=>{
+      queryS.forEach(doc=>{
+        if(doc.data().barcode==data && bool!=true)
+        {
+          console.log(doc.data().barcode)
+          bool=true;
+          navigation.navigate("MealProperties",{id: doc.id, date: date, meal: name})
 
+        }
+        
+      })
+      if(!bool)
+    {
+      navigation.navigate("AddAdd", { barcode: data })
+    }
+    })
+    
+  };
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
   }
@@ -45,7 +66,7 @@ const Scan = () => {
       <Pressable
         style={styles.iconChevronDown}
         onPress={() =>
-          navigation.navigate("DrawerRoot", { screen: "BottomTabsRoot" })
+          navigation.navigate("BottomTabsRoot", { name: name, date: date })
         }
       >
         <Image
