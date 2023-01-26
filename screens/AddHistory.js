@@ -93,7 +93,7 @@ const AddHistory = () => {
     <View style={styles.addHistory}>
       <ScrollView>
         <View style={styles.container}>
-          {dataTest.map((item, index) => {
+          {dataTest.map((item) => {
             return (
               <View style={styles.meal} key={item.id}>
                 <TouchableOpacity onPress={() => {
