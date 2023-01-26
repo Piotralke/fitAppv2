@@ -2,7 +2,7 @@ import * as React from "react";
 import { StyleSheet, View, Text, Image, Pressable, TextInput, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState, useEffect } from "react";
-import { auth, db,firebase } from "../firebase.js";
+import { auth, db, firebase } from "../firebase.js";
 
 const MealProperties = () => {
   const navigation = useNavigation();
@@ -11,20 +11,16 @@ const MealProperties = () => {
   const date = route.params.date;
   const mealCategory = route.params.meal;
   const [meal, setMeal] = useState({});
-  const [grams, setGrams] = useState("");
+  const [grams, setGrams] = useState(null);
   const uid = auth.currentUser?.uid;
-  
+
 
   useEffect(() => {
     setMeal({});
-    console.log(mid);
-    console.log(date);
-    console.log(mealCategory)
     db.collection('meals').doc(mid).get()
       .then(
         doc => {
           if (doc.exists) {
-            console.log(doc.data().name)
             setMeal(doc.data())
           } else {
             console.log("No such document!")
@@ -52,24 +48,30 @@ const MealProperties = () => {
         <TextInput
           style={styles.rectangleTextInput}
           placeholder="Placeholder text"
-          keyboardType="number-pad"
+          keyboardType="decimal-pad"
           keyboardShouldPersistTaps='handled'
           onChangeText={text => setGrams(text)}
         />
         <Pressable
           style={styles.rectanglePressable}
           onPress={async () => {
-            await db.collection('users').doc(uid).collection("daty").doc(date).set({},{merge: true})
-            await db.collection('users').doc(uid).collection("daty").doc(date).update({
-              [mealCategory]: firebase.firestore.FieldValue.arrayUnion({
-                mealId: mid,
-                grams: grams
+            if (grams !== null) {
+              await db.collection('users').doc(uid).collection("daty").doc(date).set({}, { merge: true })
+              await db.collection('users').doc(uid).collection("daty").doc(date).update({
+                [mealCategory]: firebase.firestore.FieldValue.arrayUnion({
+                  mealId: mid,
+                  grams: grams.replace(",", ".")
                 })
-                
-            },{merge: true});
-            navigation.navigate("MainView",{date:date})}
+
+              }, { merge: true });
+              navigation.navigate("MainView", { date: date })
+            } else {
+              alert("Wpisz wszystkie wymagane pola!")
+            }
+
           }
-            
+          }
+
         >
           <Text style={styles.add}>Add</Text>
         </Pressable>

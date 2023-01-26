@@ -1,23 +1,22 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, Text, View, Pressable, SafeAreaView, ScrollView, TouchableOpacity, LayoutAnimation, Alert, Button } from "react-native";
 import { auth, db, firebase } from "../firebase.js";
 import {
   Datepicker as RNKDatepicker,
   Icon as RNKIcon,
 } from "@ui-kitten/components";
-import { useNavigation, useRoute  } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   ProgressChart,
 } from "react-native-chart-kit";
 const uid = auth.currentUser?.uid;
-let bool =  true
 const ExpandableComponent = ({ item, onClickFunction, date, func }) => {
   //Custom Component for the Expandable List
   const [layoutHeight, setLayoutHeight] = useState(0);
   const navigation = useNavigation();
-  
+
   useEffect(() => {
-    
+
     if (item.isExpanded) {
       setLayoutHeight(null);
     } else {
@@ -35,7 +34,7 @@ const ExpandableComponent = ({ item, onClickFunction, date, func }) => {
         style={styles.header}>
         <View style={styles.mainbuttons}>
           <Text style={styles.headerText}>{item.category_name}</Text>
-          <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("BottomTabsRoot", { name: item.category_name, date: date.toLocaleDateString() })}>
+          <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("BottomTabsRoot", { name: item.category_name, date: `${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.${date.getMonth() < 9 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1}.${date.getFullYear()}` })}>
             <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-add-circle.png')} />
           </TouchableOpacity>
         </View>
@@ -50,32 +49,30 @@ const ExpandableComponent = ({ item, onClickFunction, date, func }) => {
           <TouchableOpacity
             key={key}
             style={styles.content}
-            onPress={() => Alert.alert(meal.name, 'Calories: ' + 
-            meal.Cal.toFixed(1) + '\nProtein: ' + 
-            meal.Prot.toFixed(1) + '\nFat: ' + 
-            meal.Fat.toFixed(1) + '\nCarbo: ' + 
-            meal.Carb.toFixed(1), 
-            [{ text: "Ok",}, 
-            { text: "Delete", 
-            style: 'destructive',
-            onPress: async ()=>{
-              let array = await db.collection('users').doc(uid).collection("daty").doc(date.toLocaleDateString()).get();
-              let data = array.data();
-              console.log(data)
-              console.log(data[item.category_name].length)
-              let newArray
-              if(data[item.category_name].length==1)
+            onPress={() => Alert.alert(meal.name, 'Calories: ' +
+              meal.Cal.toFixed(1) + '\nProtein: ' +
+              meal.Prot.toFixed(1) + '\nFat: ' +
+              meal.Fat.toFixed(1) + '\nCarbo: ' +
+              meal.Carb.toFixed(1) + "\nEaten grams: " +
+              meal.grams,
+              [{ text: "Ok", },
               {
-                  newArray=[]
-              }
-              else
-                newArray = data[item.category_name].splice(meal.id-1,1);
-              console.log(newArray)
-              data[item.category_name] = newArray ;
-              console.log(data)
-              db.collection('users').doc(uid).collection("daty").doc(date.toLocaleDateString()).set(data);
-              func()
-            }  }])}>
+                text: "Delete",
+                style: 'destructive',
+                onPress: async () => {
+                  let array = await db.collection('users').doc(uid).collection("daty").doc(`${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.${date.getMonth() < 9 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1}.${date.getFullYear()}`).get();
+                  let data = array.data();
+                  let newArray
+                  if (data[item.category_name].length == 1) {
+                    newArray = []
+                  }
+                  else
+                    newArray = data[item.category_name].splice(meal.id - 1, 1);
+                  data[item.category_name] = newArray;
+                  db.collection('users').doc(uid).collection("daty").doc(`${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}.${date.getMonth() < 9 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1}.${date.getFullYear()}`).set(data);
+                  func()
+                }
+              }])}>
             <Text style={styles.text}>
               {meal.name}
             </Text>
@@ -90,12 +87,12 @@ const ExpandableComponent = ({ item, onClickFunction, date, func }) => {
 const MainView = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const [datePicker, setDatePicker] = useState(()=>{
-    if(route.params){
+  const [datePicker, setDatePicker] = useState(() => {
+    if (route.params) {
       const dateArr = route.params.date.split(".");
-      return new Date(dateArr[2],dateArr[1]-1,dateArr[0])
+      return new Date(dateArr[2], dateArr[1] - 1, dateArr[0])
     }
-    return new Date()  
+    return new Date()
   });
   const [listDataSource, setListDataSource] = useState(CONTENT);
   const updateLayout = (index) => {
@@ -105,41 +102,40 @@ const MainView = () => {
     setListDataSource(array);
   };
   const uid = auth.currentUser?.uid;
-  const [maximums,setMaximums] =useState({
-      calories:2000,
-      proteins:50,
-      fat:70,
-      carbo:260
-  }) 
+  const [maximums, setMaximums] = useState({
+    calories: 2000,
+    proteins: 50,
+    fat: 70,
+    carbo: 260
+  })
   const colors = ['rgba(255, 0, 0,0.4)', 'rgba(238, 130, 238,0.4)', 'rgba(106, 90, 205,0.4)', 'rgba(60, 179, 113,0.4)', 'rgba(255, 172, 71 , 0.4)'];
-  const [chartData, setChartData] = useState({labels:["Calories", "Protein", "Fat", "Carbo"], 
-  data: [0,0,0,0]});
-  const [nutritions,setNutritions] = useState([0,0,0,0])
-
-  useEffect(()=>{
-    async function fetch(){
-      
-    console.log("aaaaaa");
-    const ref = db.collection('users').doc(uid);
-    const doc = await ref.get();
-    if(doc.exists)
-    {
-      console.log(doc.data())
-      setMaximums(doc.data());
-    }
-    }
-    
-    fetch()
-  },[])
+  const [chartData, setChartData] = useState({
+    labels: ["Calories", "Protein", "Fat", "Carbo"],
+    data: [0, 0, 0, 0]
+  });
+  const [nutritions, setNutritions] = useState([0, 0, 0, 0])
 
   useEffect(() => {
-    
+    navigation.addListener("focus", () => { fetch() })
+    async function fetch() {
+
+      const ref = db.collection('users').doc(uid);
+      const doc = await ref.get();
+      if (doc.exists) {
+        setMaximums(doc.data());
+      }
+    }
+  }, [])
+  useEffect(() => {
+
     fetchData();
   }, [datePicker])
   async function fetchData() {
-    setChartData({labels:["Calories", "Protein", "Fat", "Carbo"], 
-    data: [0,0,0,0]})
-    setNutritions([0,0,0,0])
+    setChartData({
+      labels: ["Calories", "Protein", "Fat", "Carbo"],
+      data: [0, 0, 0, 0]
+    })
+    setNutritions([0, 0, 0, 0])
     const list = [
       {
         isExpanded: false,
@@ -166,59 +162,54 @@ const MainView = () => {
         category_name: 'Supper',
         subcategory: [],
       }];
-      setListDataSource(list)
-    const z = await db.collection('users').doc(uid).collection("daty").doc(datePicker.toLocaleDateString()).get()
+    setListDataSource(list)
+    const z = await db.collection('users').doc(uid).collection("daty").doc(`${datePicker.getDate() < 10 ? "0" + datePicker.getDate() : datePicker.getDate()}.${datePicker.getMonth() < 9 ? "0" + (datePicker.getMonth() + 1) : datePicker.getMonth() + 1}.${datePicker.getFullYear()}`).get()
     const y = await db.collection('meals').get();
-    const idArray = y.docs.map(doc=>doc.id);
-    const dataArray = y.docs.map(doc=>doc.data());
+    const idArray = y.docs.map(doc => doc.id);
+    const dataArray = y.docs.map(doc => doc.data());
     const x = z.data()
     let sumCal = 0;
     let sumProt = 0;
     let sumFat = 0;
     let sumCarb = 0;
-    if(x)
-    {
+    if (x) {
       list.forEach(element => {
-        if(x.hasOwnProperty(element.category_name))
-        {
+        if (x.hasOwnProperty(element.category_name)) {
           x[element.category_name].forEach(async el => {
-            const meal = dataArray.at(idArray.indexOf(el.mealId))
-            const multiply = el.grams/100;
+            const meal = dataArray[idArray.indexOf(el.mealId)]
+            const multiply = el.grams / 100;
             element.subcategory.push({
               id: x[element.category_name].indexOf(el),
               name: meal.name,
-              Cal: meal.calories*multiply,
-              Prot: meal.protein*multiply,
-              Fat: meal.fat*multiply,
-              Carb: meal.carbo*multiply
+              Cal: meal.calories * multiply,
+              Prot: meal.protein * multiply,
+              Fat: meal.fat * multiply,
+              Carb: meal.carbo * multiply,
+              grams: el.grams
             })
-            sumCal+=meal.calories*multiply
-            sumProt+=meal.protein*multiply
-            sumFat+=meal.fat*multiply
-            sumCarb+=meal.carbo*multiply
+            sumCal += meal.calories * multiply
+            sumProt += meal.protein * multiply
+            sumFat += meal.fat * multiply
+            sumCarb += meal.carbo * multiply
           });
         }
-        
+
       });
-     
+
       setChartData({
-        labels:["Calories", "Protein", "Fat", "Carbo"], 
-        data: [sumCal/maximums.calories<1.0?sumCal/maximums.calories:1.0,sumProt/ maximums.proteins<1.0?sumProt/ maximums.proteins:1.0,sumFat/ maximums.fat<1.0?sumFat/ maximums.fat:1.0,sumCarb/maximums.carbo<1.0?sumCarb/maximums.carbo:1.0]
+        labels: ["Calories", "Protein", "Fat", "Carbo"],
+        data: [sumCal / maximums.calories < 1.0 ? sumCal / maximums.calories : 1.0, sumProt / maximums.proteins < 1.0 ? sumProt / maximums.proteins : 1.0, sumFat / maximums.fat < 1.0 ? sumFat / maximums.fat : 1.0, sumCarb / maximums.carbo < 1.0 ? sumCarb / maximums.carbo : 1.0]
       })
-      setNutritions([sumCal,sumProt,sumFat,sumCarb])
-      console.log(list)
+      setNutritions([sumCal, sumProt, sumFat, sumCarb])
       setListDataSource(list)
-      
+
     }
-    
-    console.log("maximums")
-    console.log(maximums)
   }
   return (
     <View style={styles.mainView} >
 
       <RNKDatepicker
-        style = {{left: "-10%"}}
+        style={{ left: "-10%" }}
         accessoryLeft={<RNKIcon name="calendar-outline" pack="material" />}
         date={datePicker}
         onSelect={setDatePicker}
@@ -240,7 +231,7 @@ const MainView = () => {
               }}
               item={item}
               date={datePicker}
-              func = {fetchData}
+              func={fetchData}
             />
           ))}
         </ScrollView>
@@ -262,10 +253,10 @@ const MainView = () => {
               borderRadius: 16
             },
           }} />
-        <Text style={{ position:"relative", left: "12%" }}>Cal:{nutritions[0].toFixed(1)}/{maximums.calories}</Text>
-        <Text style={{ position:"relative",left: "12%" }}>Prot: {nutritions[1].toFixed(1)}/{maximums.proteins}</Text>
-        <Text style={{ position:"relative", left: "12%" }}>Fat: {nutritions[2].toFixed(1)}/{maximums.fat}</Text>
-        <Text style={{ position:"relative",left: "12%" }}>Carbo:{nutritions[3].toFixed(1)}/{maximums.carbo}</Text>
+        <Text style={{ position: "relative", left: "12%" }}>Cal:{nutritions[0].toFixed(1)}/{maximums.calories}</Text>
+        <Text style={{ position: "relative", left: "12%" }}>Prot: {nutritions[1].toFixed(1)}/{maximums.proteins}</Text>
+        <Text style={{ position: "relative", left: "12%" }}>Fat: {nutritions[2].toFixed(1)}/{maximums.fat}</Text>
+        <Text style={{ position: "relative", left: "12%" }}>Carbo:{nutritions[3].toFixed(1)}/{maximums.carbo}</Text>
       </View>
 
     </View>
@@ -329,7 +320,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     width: 354,
     height: 56,
+    flex: 1,
     flexDirection: 'row',
+    justifyContent: "space-between"
   },
   header: {
     backgroundColor: '#967474', //braz
@@ -338,8 +331,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
     fontWeight: '500',
-    backgroundColor: '#91C789',
     textAlign: "left",
+    marginLeft: 10,
+    marginTop: 11,
   },
   mainView: {
     position: "relative",
@@ -353,9 +347,12 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     overflow: "hidden",
     maxHeight: "100%",
+    marginRight: 10,
+    marginTop: 8,
   },
   settings1: {
     position: "relative",
+
   },
 });
 

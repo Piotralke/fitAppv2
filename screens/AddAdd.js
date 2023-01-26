@@ -7,105 +7,114 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard
 } from "react-native";
-import { useNavigation,useRoute } from "@react-navigation/native";
-import {auth, db} from "../firebase.js";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { auth, db } from "../firebase.js";
 import { useState, useEffect } from "react";
 const AddAdd = () => {
-  const [name,setName] =useState("");
-  const [calories,setCalories] =useState("");
-  const [protein,setProtein] =useState("");
-  const [fat,setFat] =useState("");
-  const [carbo,setCarbo] =useState("");
-  const [barcode,setBarcode] =useState("");
+  const [name, setName] = useState(null);
+  const [calories, setCalories] = useState(null);
+  const [protein, setProtein] = useState(null);
+  const [fat, setFat] = useState(null);
+  const [carbo, setCarbo] = useState(null);
+  const [barcode, setBarcode] = useState("");
   const navigation = useNavigation();
   const uid = auth.currentUser?.uid;
   const route = useRoute();
   const scannedBarcode = route.params.barcode;
-  const [c] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.date);
-  const [cat_name] = useState(navigation.getParent().getState().routes.find(x=>x.name=="BottomTabsRoot").params.name);
+  const [c] = useState(navigation.getParent().getState().routes.find(x => x.name == "BottomTabsRoot").params.date);
+  const [cat_name] = useState(navigation.getParent().getState().routes.find(x => x.name == "BottomTabsRoot").params.name);
 
-  useEffect(()=>{
-  },[])
+  useEffect(() => {
+  }, [])
   return (
-    <View style={styles.addAdd}>
-      <View style={styles.groupView}>
-      <Text style={styles.name}>Name</Text>
-        <TextInput
-          style={styles.rectangleTextInput}
-          placeholder="Placeholder text"
-          keyboardType="default"
-          onChangeText={text => setName(text)}
-        />
-        <Text style={styles.name}>
-          Nutrition facts per 100g
-        </Text>
-        <Text style={styles.name}>Calories</Text>
-        <TextInput style={styles.rectangleTextInput} 
-        placeholder="Placeholder text"
-        keyboardType="default"
-        onChangeText={text => setCalories(text)}
-        />
-        <Text style={styles.name}>Protein</Text>
-        <TextInput
-          style={styles.rectangleTextInput}
-          placeholder="Placeholder text"
-          keyboardType="default"
-          onChangeText={text => setProtein(text)}
-        />
-        <Text style={styles.name}>Fat</Text>
-        <TextInput
-          style={styles.rectangleTextInput}
-          placeholder="Placeholder text"
-          keyboardType="default"
-          onChangeText={text => setFat(text)}
-        />
-        <Text style={styles.name}>Carbo</Text>
-        <TextInput
-          style={styles.rectangleTextInput}
-          placeholder="Placeholder text"
-          keyboardType="default"
-          onChangeText={text => setCarbo(text)}
-        />
-        <Text style={styles.name}>Barcode*</Text>
-        <View style={{flexDirection: 'row'}}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
+      <View style={styles.addAdd}>
+        <View style={styles.groupView}>
+          <Text style={styles.name}>Name</Text>
           <TextInput
-          style={styles.rectangleTextInput2}
-          placeholder="Placeholder text"
-          keyboardType="default"
-          onChangeText={text => setBarcode(text)}
-          value={scannedBarcode?scannedBarcode:""}
-         />
-
-            <Pressable onPress={() => navigation.navigate("Scan",{name:cat_name,date:c})}>
-            <Image
-            style={styles.scan}
-            resizeMode="cover"
-            source={require("../assets/vector4.png")}
+            style={styles.rectangleTextInput}
+            placeholder="Enter name"
+            keyboardType="default"
+            onChangeText={text => setName(text)}
+          />
+          <Text style={styles.name}>
+            Nutrition facts per 100g
+          </Text>
+          <Text style={styles.name}>Calories</Text>
+          <TextInput style={styles.rectangleTextInput}
+            placeholder="Enter calories"
+            keyboardType="decimal-pad"
+            onChangeText={text => setCalories(text)}
+          />
+          <Text style={styles.name}>Protein</Text>
+          <TextInput
+            style={styles.rectangleTextInput}
+            placeholder="Enter protein"
+            keyboardType="decimal-pad"
+            onChangeText={text => setProtein(text)}
+          />
+          <Text style={styles.name}>Fat</Text>
+          <TextInput
+            style={styles.rectangleTextInput}
+            placeholder="Enter fat"
+            keyboardType="decimal-pad"
+            onChangeText={text => setFat(text)}
+          />
+          <Text style={styles.name}>Carbo</Text>
+          <TextInput
+            style={styles.rectangleTextInput}
+            placeholder="Enter carbo"
+            keyboardType="decimal-pad"
+            onChangeText={text => setCarbo(text)}
+          />
+          <Text style={styles.name}>Barcode*</Text>
+          <View style={{ flexDirection: 'row' }}>
+            <TextInput
+              style={styles.rectangleTextInput2}
+              placeholder="Enter barcode"
+              keyboardType="decimal-pad"
+              onChangeText={text => setBarcode(text)}
+              value={scannedBarcode ? scannedBarcode : ""}
             />
+
+            <Pressable onPress={() => navigation.navigate("Scan", { name: cat_name, date: c })}>
+              <Image
+                style={styles.scan}
+                resizeMode="cover"
+                source={require("../assets/vector4.png")}
+              />
             </Pressable>
 
-        </View>
-        <Pressable style={styles.rectanglePressable1} onPress={async () => {
+          </View>
+          <Pressable style={styles.rectanglePressable1} onPress={async () => {
+
+            if ([calories, protein, fat, carbo].every(v => v !== null)) {
               const meal = await db.collection('meals').add({
-              name: name,
-              calories: calories,
-              protein: protein,
-              fat: fat,
-              carbo: carbo,
-              barcode: barcode,
-              creator: uid.trim(),
-            });
-            console.log("utworzono danie o ID: ", meal.id);
-            navigation.replace("DrawerRoot", { screen: "MainView" })
-        }}>
-        <Text style={styles.save}>Save</Text>
-            </Pressable>
-        
-        
-        <Text style={styles.name}>*Not required</Text>
+                name: name,
+                calories: calories.replace(",", "."),
+                protein: protein.replace(",", "."),
+                fat: fat.replace(",", "."),
+                carbo: carbo.replace(",", "."),
+                barcode: scannedBarcode,
+                creator: uid.trim(),
+              });
+              navigation.replace("DrawerRoot", { screen: "MainView" })
+            } else {
+              alert("Wpisz wszystkie wymagane pola!")
+            }
+
+          }}>
+            <Text style={styles.save}>Save</Text>
+          </Pressable>
+
+
+          <Text style={styles.name}>*Not required</Text>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -154,7 +163,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     width: 285,
     height: 40,
-    textAlign:"center",
+    textAlign: "center",
   },
   rectanglePressable1: {
     position: "relative",
@@ -179,7 +188,7 @@ const styles = StyleSheet.create({
     color: "#000",
     textAlign: "center",
     marginHorizontal: "auto",
-    top:15,
+    top: 15,
   },
   groupView: {
     flexDirection: 'column',
@@ -199,8 +208,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   scan: {
-    marginLeft:8,
-    marginTop:10,
+    marginLeft: 8,
+    marginTop: 10,
   },
 });
 

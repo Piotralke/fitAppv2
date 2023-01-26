@@ -22,68 +22,53 @@ const AddHistory = () => {
   const [search, setSearch] = useState("")
 
   //const [cat, setCat] = useState(route.params.name);
-  useEffect(()=>{
+  useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <TextInput 
-        style={styles.search} 
+        <TextInput
+          style={styles.search}
           placeholder="Search"
           keyboardType="default"
           placeholderTextColor="#fff"
-          onChangeText={text=>setSearch(text)}
+          onChangeText={text => setSearch(text)}
         />
       ),
-      headerRight: () =>(
-        <Pressable onPress={() => navigation.navigate("Scan",{name:name,date:c})}>
-        <Image
-        style={styles.scan}
-        resizeMode="cover"
-        source={require("../assets/vector4.png")}
-        />
+      headerRight: () => (
+        <Pressable onPress={() => navigation.navigate("Scan", { name: name, date: c })}>
+          <Image
+            style={styles.scan}
+            resizeMode="cover"
+            source={require("../assets/vector4.png")}
+          />
         </Pressable>
       ),
     })
-  },[]);
+  }, []);
+  useEffect(() => {
 
-  useEffect(() => {
-    console.log(search)
-  }, [search])
-  useEffect(() => {
-    console.log(c);
-    console.log("chuj");
-    // console.log(this.props.catName);
     setDataTest([]);
     if (search.length === 0) {
       const today = new Date();
       const set = new Set();
       const dbData = db.collection("users").doc(uid).collection("daty").get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          console.log(doc.id)
           const dateArr = doc.id.split(".");
           const date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
-      //    console.log(today.getVarDate()-7)
-          if(today-7 * 86400000 <date)
-          {
-            Object.keys(doc.data()).forEach((i)=>{
-              doc.data()[i].forEach(meal=>{
+          if (today - 7 * 86400000 < date) {
+            Object.keys(doc.data()).forEach((i) => {
+              doc.data()[i].forEach(meal => {
                 set.add(meal.mealId)
-                // dodawanie do seta i pozniej poobieranie tych wszystkich z seta
               })
             })
-            console.log(set)
-            const meals = db.collection("meals").get().then(querySnapshot=>{
-              querySnapshot.forEach(doc=>{
-                if(set.has(doc.id))
-                {
+            const meals = db.collection("meals").get().then(querySnapshot => {
+              querySnapshot.forEach(doc => {
+                if (set.has(doc.id)) {
                   setDataTest(dataTest => [...dataTest, doc])
                   set.delete(doc.id)
                 }
-                    
+
               })
             })
-            //doc.data() .forEach(el=>{
-            //  console.log(el)
-            //})
           }
         })
       }
@@ -106,12 +91,11 @@ const AddHistory = () => {
   }, [c, name, search]);
   return (
     <View style={styles.addHistory}>
-      <View style={styles.list}>
-        <Text>{c}</Text>
-        <ScrollView>
+      <ScrollView>
+        <View style={styles.container}>
           {dataTest.map((item, index) => {
             return (
-              <View style={styles.meal} key={index}>
+              <View style={styles.meal} key={item.id}>
                 <TouchableOpacity onPress={() => {
                   navigation.navigate("MealProperties", { id: item.id, date: c, meal: name })
                 }}>
@@ -122,8 +106,9 @@ const AddHistory = () => {
             )
 
           })}
-        </ScrollView>
-      </View>
+        </View>
+
+      </ScrollView>
     </View>
   );
 };
@@ -134,37 +119,50 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
     position: "relative",
-    borderRadius: 54,
-    backgroundColor: "#91c789",
+    width: 248,
+    height: 56,
+    paddingTop: 5,
+  },
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 10
+  },
+  itemContainer: {
+    width: '100%',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f9f9f9',
+    marginVertical: 10
+  },
+
+  meal: {
     shadowColor: "rgba(0, 0, 0, 0.25)",
     shadowOffset: {
       width: 0,
       height: 4,
     },
     shadowRadius: 4,
-    elevation: 4,
     shadowOpacity: 1,
-    width: 248,
-    height: 56,
-    marginTop: 10,
-    paddingTop: 5,
-  },
-  list: {
-    flex: 1,
-    marginHorizontal: "auto",
-    alignItems: "center",
-    paddingTop: "10%",
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  meal: {
+    borderRadius: 54,
+    backgroundColor: "#91c789",
     position: "relative",
     width: 300,
     flexDirection: 'column',
-    justifyContent: 'center',
+
+    width: '100%',
+    height: 50,
     alignItems: 'center',
-    padding: 5,
+    justifyContent: 'center',
+    backgroundColor: "#91c789",
+    marginVertical: 10
+
+  },
+  search: {
+    height: 30,
   },
   addHistory: {
     backgroundColor: "#967474",
@@ -177,42 +175,8 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: "hidden",
   },
+  scan: {
+    marginRight: 12,
+  },
 });
-const CONTENT = [
-  {
-    name: 'Egg',
-    Cal: 100,
-    Prot: 50,
-    Fat: 20,
-    Carb: 150
-  },
-  {
-    name: 'Bread',
-    Cal: 100,
-    Prot: 50,
-    Fat: 20,
-    Carb: 150
-  },
-  {
-    name: 'Sausage',
-    Cal: 100,
-    Prot: 50,
-    Fat: 20,
-    Carb: 150
-  },
-  {
-    name: 'Biscuits',
-    Cal: 100,
-    Prot: 50,
-    Fat: 20,
-    Carb: 150
-  },
-
-  {
-    name: 'Banana',
-    Cal: 100,
-    Prot: 50,
-    Fat: 20,
-    Carb: 150
-  }];
 export default AddHistory;

@@ -9,39 +9,38 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {auth, db} from "../firebase.js";
+import { auth, db } from "../firebase.js";
 const Login = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
-      if(user){
+      if (user) {
         setPassword("");
         setEmail("");
         navigation.navigate("DrawerRoot", { screen: "MainView" })
       }
     })
     return unsubscribe
-  },[])
+  }, [])
 
   const handleLogin = () => {
     auth
       .signInWithEmailAndPassword(email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-        console.log(user.email);
       })
       .catch(error => alert(error.message))
-    }
+  }
 
-  
+
 
 
   return (
     <View style={styles.login}>
-      
-      
+
+
       <ImageBackground
         style={styles.logo1Icon}
         resizeMode="center"
@@ -56,7 +55,7 @@ const Login = () => {
           keyboardType="default"
         />
         <TextInput
-        value={password}
+          value={password}
           style={styles.rectangleTextInput1}
           onChangeText={text => setPassword(text)}
           placeholder="password"
@@ -64,17 +63,17 @@ const Login = () => {
           secureTextEntry={true}
         />
         <Pressable
-        style={styles.rectanglePressable}
-        onPress={handleLogin}>
-      <Text style={styles.logIn}>Log in</Text>
-      </Pressable>
-      <Pressable
-        style={styles.dontHaveAccountRegister}
-        onPress={() => navigation.navigate("Register")}
-      >
-        <Text style={styles.dontHaveAccount}>{`Don’t have account? `}</Text>
-        <Text style={styles.register}>Register</Text>
-      </Pressable>
+          style={styles.rectanglePressable}
+          onPress={handleLogin}>
+          <Text style={styles.logIn}>Log in</Text>
+        </Pressable>
+        <Pressable
+          style={styles.dontHaveAccountRegister}
+          onPress={() => navigation.navigate("Register")}
+        >
+          <Text style={styles.dontHaveAccount}>{`Don’t have account? `}</Text>
+          <Text style={styles.register}>Register</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -83,7 +82,7 @@ const Login = () => {
 const styles = StyleSheet.create({
   rectanglePressable: {
     position: "relative",
-    top:100,
+    top: 100,
     borderRadius: 54,
     backgroundColor: "#91c789",
     shadowColor: "rgba(0, 0, 0, 0.25)",
@@ -100,9 +99,8 @@ const styles = StyleSheet.create({
   },
   logIn: {
     position: "relative",
-    top :10,
+    top: 10,
     fontSize: 20,
-    fontFamily: "Epilogue",
     color: "#000",
     textAlign: "center",
   },
@@ -113,10 +111,10 @@ const styles = StyleSheet.create({
     color: "#91c789",
   },
   dontHaveAccountRegister: {
-    top:110,
+    top: 110,
     position: "relative",
     fontSize: 15,
-    fontFamily: "Epilogue",
+
     textAlign: "center",
   },
   logo1Icon: {
@@ -146,7 +144,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     width: 318,
     height: 40,
-    
+
   },
   rectangleTextInput1: {
     top: 50,
@@ -179,7 +177,7 @@ const styles = StyleSheet.create({
   },
   login: {
     position: "relative",
-    backgroundColor: "#967474",   
+    backgroundColor: "#967474",
     width: "100%",
     height: "100%",
     overflow: "hidden",

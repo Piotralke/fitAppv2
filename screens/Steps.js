@@ -7,39 +7,54 @@ import {
   ProgressChart
 } from "react-native-chart-kit";
 import { Pedometer } from 'expo-sensors';
+import { auth, db, firebase } from "../firebase.js";
 const Steps = () => {
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
-  const [pastStepCount, setPastStepCount] = useState(0);
   const navigation = useNavigation();
-  const [dataTest, setDataTest] = useState([]);
-
-  const subscribe = async () => {
-    const isAvailable = await Pedometer.isAvailableAsync();
-    setIsPedometerAvailable(String(isAvailable));
-    if (isAvailable) {
-      const date = new Date();
-
-      for (let i = 0; i < 7; i++) {
-        const test = await Pedometer.getStepCountAsync(new Date(date.getFullYear(), date.getMonth(), date.getDate() - (i + 1)), new Date(date.getFullYear(), date.getMonth(), date.getDate() - i));
-        if (test) {
-          setDataTest(dataTest => [...dataTest, test.steps])
-        }
-      }
-      console.log(dataTest)
-    }
-  }
-  useEffect(()=>{
-    const subscription=subscribe();
-    return () => subscription && subscription.remove();
-  }, []);
-  const data = {
+  const [dataTest, setDataTest] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [steps, setSteps] = useState(8000)
+  const uid = auth.currentUser?.uid;
+  const [data, setData] = useState({
     labels: ["08.12", "09.12", "10.12", "11.12", "12.12", "13.12", "14.12"],
     datasets: [
       {
         data: [4507, 7950, 5522, 7835, 6432, 7925, 5135]
       }
     ]
-  };
+  })
+  const subscribe = async () => {
+    const user = await db.collection("users").doc(uid).get();
+    const userData = user.data();
+    setSteps(userData.steps);
+    const isAvailable = await Pedometer.isAvailableAsync();
+    setIsPedometerAvailable(String(isAvailable));
+    if (isAvailable) {
+      const date = new Date();
+      let data = []
+      let dateArray = []
+      for (let i = -1; i < 6; i++) {
+        const test = await Pedometer.getStepCountAsync(new Date(date.getFullYear(), date.getMonth(), date.getDate() - (i + 1)), new Date(date.getFullYear(), date.getMonth(), date.getDate() - i));
+        if (test) {
+          data.unshift(test.steps)
+          dateArray.unshift(`${date.getDate() - (i + 1) < 10 ? "0" + date.getDate() - (i + 1) : date.getDate() - (i + 1)}.${date.getMonth() < 9 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1}`)
+        }
+      }
+
+      setDataTest(data)
+      setData({
+        labels: dateArray,
+        datasets: [{
+          data: data
+        }]
+      })
+    }
+  }
+  useEffect(() => {
+    
+    const subscription = subscribe();
+    return () => subscription;
+  }, []);
+
   const chartConfig = {
     backgroundGradientFrom: "#1E2923",
     backgroundGradientFromOpacity: 0,
@@ -55,7 +70,7 @@ const Steps = () => {
       <View>
         <ProgressChart
           style={styles.ringChart}
-          data={[5123 / 8000]}
+          data={[(dataTest[6] / steps>1)?1:dataTest[6] / steps]}
           width={300}
           height={220}
           chartConfig={chartConfig}
@@ -74,13 +89,13 @@ const Steps = () => {
           showValuesOnTopOfBars={true}
         />
       </View>
-      <Text style={styles.steps}>Steps today: 5135/8000</Text>
+      <Text style={styles.steps}>Steps today: {dataTest[6]}/{steps}</Text>
       <View style={styles.average}>
         <View style={styles.rectangleView2}>
           <Text style={styles.yourAverageStepsForWeek}>
             Your average steps for week:
           </Text>
-          <Text style={styles.text20}>6427</Text>
+          <Text style={styles.text20}>{(dataTest.reduce((a, b) => a + b, 0) / dataTest.length).toFixed(0)}</Text>
         </View>
       </View>
 

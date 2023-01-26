@@ -23,26 +23,22 @@ const Scan = () => {
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
-    console.log("skaaaaaaaaan")
     let bool = false;
-    
-    db.collection("meals").get().then(queryS=>{
-      queryS.forEach(doc=>{
-        if(doc.data().barcode==data && bool!=true)
-        {
-          console.log(doc.data().barcode)
-          bool=true;
-          navigation.navigate("MealProperties",{id: doc.id, date: date, meal: name})
+
+    db.collection("meals").get().then(queryS => {
+      queryS.forEach(doc => {
+        if (doc.data().barcode == data && bool != true) {
+          bool = true;
+          navigation.navigate("MealProperties", { id: doc.id, date: date, meal: name })
 
         }
-        
+
       })
-      if(!bool)
-    {
-      navigation.navigate("AddAdd", { barcode: data })
-    }
+      if (!bool) {
+        navigation.navigate("AddAdd", { barcode: data })
+      }
     })
-    
+
   };
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
@@ -57,24 +53,13 @@ const Scan = () => {
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
-      
+
       <Image
         style={styles.vectorIcon}
         resizeMode="cover"
         source={require("../assets/vector.png")}
       />
-      <Pressable
-        style={styles.iconChevronDown}
-        onPress={() =>
-          navigation.navigate("BottomTabsRoot", { name: name, date: date })
-        }
-      >
-        <Image
-          style={styles.icon}
-          resizeMode="cover"
-          source={require("../assets/-icon-chevron-down.png")}
-        />
-      </Pressable>
+
     </View>
   );
 };
@@ -92,20 +77,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     maxHeight: "100%",
   },
-  icon: {
-    height: "100%",
-    width: "100%",
-    maxWidth: "100%",
-    overflow: "hidden",
-    maxHeight: "100%",
-  },
-  iconChevronDown: {
-    position: "relative",
-    left: "8.21%",
-    top: "10%",
-    width: "3.1%",
-    height: "2.48%",
-  },
+
   scan: {
     position: "relative",
     backgroundColor: "#967474",

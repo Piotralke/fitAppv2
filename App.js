@@ -13,8 +13,6 @@ import MealProperties from "./screens/MealProperties";
 import AddAdd from "./screens/AddAdd";
 import AddYours from "./screens/AddYours";
 import AddHistory from "./screens/AddHistory";
-import AddMakeNew from "./screens/AddMakeNew";
-import AddSearch from "./screens/AddSearch";
 import Yours1 from "./components/Yours1";
 import Yours from "./components/Yours";
 import Add1 from "./components/Add1";
@@ -35,9 +33,11 @@ import {
   Image,
   TextInput,
   Button,
+  LogBox,
 } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+LogBox.ignoreAllLogs();
 
 
 
@@ -57,15 +57,6 @@ function DrawerRoot({ navigation }) {
         screenOptions={{ unmountOnBlur: true }}
       />
 
-      <Stack.Screen
-        name="Settings"
-        component={Settings1}
-        options={{
-          headerShown: true,
-          title: "",
-          headerStyle: { backgroundColor: "#91c789" }
-        }}
-      />
 
       <Stack.Screen
         name="MainView"
@@ -84,7 +75,6 @@ function BottomTabsRoot({ navigation }) {
   const route = useRoute();
   const cat_name = route.params.name;
   const date = route.params.date;
-  const [search, setSearch] = React.useState("dupa")
 
   const [bottomTabItemsNormal] = React.useState([
     <Yours />,
@@ -161,7 +151,7 @@ function BottomTabsRoot({ navigation }) {
       <Tab.Screen
         name="AddAdd"
         component={AddAdd}
-        initialParams={{barcode:""}}
+        initialParams={{ barcode: "" }}
         options={{
           unmountOnBlur: true,
           headerShown: true,
@@ -257,14 +247,22 @@ const App = () => {
               <Stack.Screen
                 name="Scan"
                 component={Scan}
-                options={{ headerShown: false }}
+                options={{
+                  headerShown: true,
+                  title: "",
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
                 screenOptions={{ unmountOnBlur: true }}
               />
 
               <Stack.Screen
                 name="Register"
                 component={Register}
-                options={{ headerShown: false }}
+                options={{
+                  headerShown: true,
+                  title: "",
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
               />
 
               <Stack.Screen
@@ -276,7 +274,15 @@ const App = () => {
                   headerStyle: { backgroundColor: "#91c789" }
                 }}
               />
-
+              <Stack.Screen
+                name="Settings"
+                component={Settings1}
+                options={{
+                  headerShown: true,
+                  title: "",
+                  headerStyle: { backgroundColor: "#91c789" }
+                }}
+              />
 
               <Stack.Screen
                 name="MealProperties"
@@ -288,24 +294,6 @@ const App = () => {
                 }}
               />
 
-              <Stack.Screen
-                name="AddMakeNew"
-                component={AddMakeNew}
-                options={{
-                  headerShown: true,
-                  title: "",
-                  headerStyle: { backgroundColor: "#91c789" }
-                }}
-              />
-              <Stack.Screen
-                name="AddSearch"
-                component={AddSearch}
-                options={{
-                  headerShown: true,
-                  title: "",
-                  headerStyle: { backgroundColor: "#91c789" }
-                }}
-              />
             </Stack.Navigator>
           ) : null}
         </NavigationContainer>

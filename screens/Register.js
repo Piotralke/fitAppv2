@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {auth, db} from "../firebase.js";
+import { auth, db } from "../firebase.js";
 const Register = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
@@ -11,27 +11,25 @@ const Register = () => {
 
 
   const handleSignUP = () => {
-    if(password===confirmPassword)
-    {
+    if (password === confirmPassword) {
       auth
-      .createUserWithEmailAndPassword(email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log(user.email);
-        db.collection('users').doc(user.uid).set({'email': user.email, "calories": 2000, "proteins": 50, "fat": 70, "carbo":260})
-      })
-      .catch(error => alert(error.message))
-      
+        .createUserWithEmailAndPassword(email, password)
+        .then(userCredentials => {
+          const user = userCredentials.user;
+          db.collection('users').doc(user.uid).set({ 'email': user.email, "calories": 2000, "proteins": 50, "fat": 70, "carbo": 260, "steps": 8000 })
+        })
+        .catch(error => alert(error.message))
+
     }
-    else{}
+    else { }
   }
 
   return (
     <View style={styles.register1}>
-      
+
       <View style={styles.groupView}>
         <TextInput
-        onChangeText={text => setEmail(text)}
+          onChangeText={text => setEmail(text)}
           style={styles.rectangleTextInput}
           placeholder="E-mail"
           keyboardType="default"
@@ -49,11 +47,11 @@ const Register = () => {
           keyboardType="default"
         />
         <Pressable
-        style={styles.rectanglePressable}
-        onPress={handleSignUP}
-      >
-      <Text style={styles.register}>Register</Text>
-      </Pressable>
+          style={styles.rectanglePressable}
+          onPress={handleSignUP}
+        >
+          <Text style={styles.register}>Register</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -62,7 +60,7 @@ const Register = () => {
 const styles = StyleSheet.create({
   rectanglePressable: {
     position: "relative",
-    alignSelf:"center",
+    alignSelf: "center",
     borderRadius: 54,
     backgroundColor: "#91c789",
     shadowColor: "rgba(0, 0, 0, 0.25)",
@@ -113,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     top: "10%",
     width: "100%",
-    
+
   },
   register1: {
     position: "relative",

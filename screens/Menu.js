@@ -11,41 +11,37 @@ import {
   SafeAreaView,
   TouchableOpacity
 } from "react-native";
-import {auth, db} from "../firebase.js";
+import { auth, db } from "../firebase.js";
 const Menu = ({ state, navigation }) => {
   return (
-    <SafeAreaView style={styles.menu}>      
+    <SafeAreaView style={styles.menu}>
       <View style={styles.view}>
-      <Text style={[styles.helloUser]}>Hello, user</Text>
-        <Image
-          style={styles.iconPerson}
-          resizeMode="cover"
-          source={require("../assets/-icon-person.png")}
-        />
-        <TouchableOpacity style={[styles.settings1]} onPress={()=>navigation.navigate("Steps")}>
-        <View style={{flexDirection: 'row'}}>
-        <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/vector2.png')} />
-        <Text style={styles.settings}>Steps</Text>
-        </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.settings1]} onPress={()=>navigation.navigate("Settings")}>
-        <View style={{flexDirection: 'row'}}>
-        <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-settings.png')} />
-        <Text style={styles.settings}>Settings</Text>
+        <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("Steps")}>
+          <View style={{ flexDirection: 'row' }}>
+            <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/vector2.png')} />
+            <Text style={[styles.settings]}>Steps</Text>
           </View>
-        </TouchableOpacity> 
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.settings1]} onPress={() => navigation.navigate("Settings")}>
+          <View style={{ flexDirection: 'row' }}>
+            <Image style={styles.iconSettings} resizeMode="cover" source={require('../assets/-icon-settings.png')} />
+            <Text style={[styles.settings]}>Settings</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
-        style={[styles.rectanglePressable]}
-        onPress={() => {auth.signOut();
-          navigation.navigate("Login")}
-        
-        }> 
-          
-        <Text style={styles.logout}>Logout</Text>
-        </TouchableOpacity> 
+          style={[styles.rectanglePressable]}
+          onPress={() => {
+            auth.signOut();
+            navigation.navigate("Login")
+          }
+
+          }>
+
+          <Text style={styles.logout}>Logout</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
-    
+
   );
 };
 
@@ -57,9 +53,11 @@ const styles = StyleSheet.create({
   settings: {
     fontSize: 20,
     fontStyle: "italic",
-    fontFamily: "Epilogue",
+    fontFamily: "Roboto",
     color: "#000",
     textAlign: "left",
+    margin: 5,
+    left: "2%",
   },
   iconSettings: {
     maxWidth: "100%",
@@ -68,7 +66,8 @@ const styles = StyleSheet.create({
   },
   settings1: {
     position: "relative",
-    paddingTop: 10,
+    paddingVertical: 10,
+    margin: 10,
   },
   rectanglePressable: {
     position: "relative",
@@ -85,6 +84,8 @@ const styles = StyleSheet.create({
     width: 139,
     height: 44,
     alignItems: "center",
+    left: "2%",
+    top: "70%"
   },
   iconPerson: {
     position: "relative",
@@ -107,15 +108,17 @@ const styles = StyleSheet.create({
     fontFamily: "Epilogue",
     color: "#ff0000",
     textAlign: "center",
+    top: 11,
   },
   view: {
     position: "relative",
-    top:"3%",
+    top: "3%",
     backgroundColor: "#91c789",
     flex: 1,
     width: "100%",
     height: 896,
     overflow: "hidden",
+
   },
 });
 
